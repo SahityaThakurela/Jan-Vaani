@@ -1,0 +1,189 @@
+{
+  "schemes": [
+    {
+      "scheme_id": "PM-KISAN-001",
+      "name_en": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+      "name_hi": "प्रधानमंत्री किसान सम्मान निधि",
+      "aliases": ["pm kisan", "kisan samman", "pmkisan", "किसान निधि", "kisan nidhi"],
+      "category": "agriculture",
+      "description_en": "PM-KISAN provides income support of Rs. 6,000 per year to small and marginal farmer families across India, disbursed in three equal installments of Rs. 2,000 every four months directly into their bank accounts.",
+      "description_hi": "पीएम-किसान योजना भारत में छोटे और सीमांत किसान परिवारों को प्रति वर्ष 6,000 रुपये की आय सहायता प्रदान करती है, जो हर चार महीने में 2,000 रुपये की तीन समान किस्तों में सीधे उनके बैंक खातों में जमा की जाती है।",
+      "benefits_en": "Rs. 6,000 per year (Rs. 2,000 × 3 installments) directly into bank account via DBT.",
+      "benefits_hi": "बैंक खाते में DBT के माध्यम से प्रति वर्ष 6,000 रुपये (2,000 रुपये × 3 किस्तें)।",
+      "documents_required": [
+        "Aadhaar Card",
+        "Land ownership records (Khatoni/Khasra)",
+        "Bank account linked with Aadhaar",
+        "Mobile number"
+      ],
+      "official_url": "https://pmkisan.gov.in",
+      "eligibility_rules": [
+        {
+          "field_name": "occupation",
+          "operator": "in",
+          "value": "[\"farmer\", \"agriculture\", \"kisan\", \"किसान\"]",
+          "value_type": "list",
+          "description": "Applicant must be a farmer"
+        },
+        {
+          "field_name": "land_size_acres",
+          "operator": "<=",
+          "value": "4.94",
+          "value_type": "number",
+          "description": "Land holding must be ≤ 2 hectares (≈ 4.94 acres)"
+        },
+        {
+          "field_name": "has_bank_account",
+          "operator": "==",
+          "value": "true",
+          "value_type": "boolean",
+          "description": "Must have a bank account"
+        },
+        {
+          "field_name": "has_aadhaar",
+          "operator": "==",
+          "value": "true",
+          "value_type": "boolean",
+          "description": "Must have Aadhaar card"
+        },
+        {
+          "field_name": "is_income_tax_payer",
+          "operator": "==",
+          "value": "false",
+          "value_type": "boolean",
+          "description": "Must not be an income tax payer"
+        }
+      ],
+      "required_slots": [
+        {
+          "slot_name": "occupation",
+          "slot_type": "string",
+          "question_text_en": "What is your primary occupation? Are you a farmer?",
+          "question_text_hi": "आपका मुख्य काम क्या है? क्या आप किसान हैं?",
+          "priority": 1
+        },
+        {
+          "slot_name": "land_size_acres",
+          "slot_type": "number",
+          "question_text_en": "How many acres of land do you own?",
+          "question_text_hi": "आपके पास कितने एकड़ जमीन है?",
+          "priority": 2
+        },
+        {
+          "slot_name": "has_bank_account",
+          "slot_type": "boolean",
+          "question_text_en": "Do you have a bank account?",
+          "question_text_hi": "क्या आपके पास बैंक खाता है?",
+          "priority": 3
+        },
+        {
+          "slot_name": "has_aadhaar",
+          "slot_type": "boolean",
+          "question_text_en": "Do you have an Aadhaar card?",
+          "question_text_hi": "क्या आपके पास आधार कार्ड है?",
+          "priority": 4
+        },
+        {
+          "slot_name": "is_income_tax_payer",
+          "slot_type": "boolean",
+          "question_text_en": "Do you pay income tax?",
+          "question_text_hi": "क्या आप आयकर भरते हैं?",
+          "priority": 5
+        }
+      ]
+    },
+    {
+      "scheme_id": "PMAY-G-001",
+      "name_en": "PMAY-G (Pradhan Mantri Awas Yojana - Gramin)",
+      "name_hi": "प्रधानमंत्री आवास योजना - ग्रामीण",
+      "aliases": ["pmay gramin", "pmay rural", "awas yojana", "pradhan mantri awas", "आवास योजना", "awas"],
+      "category": "housing",
+      "description_en": "PMAY-G aims to provide pucca (permanent) houses to homeless and kutcha (temporary) house dwellers in rural India. Financial assistance of Rs. 1.20 lakh in plains and Rs. 1.30 lakh in hilly/difficult areas is provided.",
+      "description_hi": "पीएमएवाई-जी का लक्ष्य ग्रामीण भारत में बेघर और कच्चे मकान में रहने वाले लोगों को पक्के मकान उपलब्ध कराना है। मैदानी इलाकों में 1.20 लाख और पहाड़ी/कठिन क्षेत्रों में 1.30 लाख रुपये की वित्तीय सहायता दी जाती है।",
+      "benefits_en": "Rs. 1.20 lakh (plains) or Rs. 1.30 lakh (hills) financial assistance for house construction.",
+      "benefits_hi": "मकान निर्माण के लिए 1.20 लाख (मैदान) या 1.30 लाख (पहाड़) रुपये की वित्तीय सहायता।",
+      "documents_required": [
+        "Aadhaar Card",
+        "SECC 2011 Survey inclusion proof",
+        "BPL Ration Card",
+        "Bank account linked with Aadhaar",
+        "Land documents (if available)"
+      ],
+      "official_url": "https://pmayg.nic.in",
+      "eligibility_rules": [
+        {
+          "field_name": "house_type",
+          "operator": "in",
+          "value": "[\"kutcha\", \"homeless\", \"no_house\", \"कच्चा\", \"बेघर\"]",
+          "value_type": "list",
+          "description": "Must be homeless or living in a kutcha (temporary) house"
+        },
+        {
+          "field_name": "residence_type",
+          "operator": "==",
+          "value": "rural",
+          "value_type": "string",
+          "description": "Must be a rural resident"
+        },
+        {
+          "field_name": "annual_income",
+          "operator": "<=",
+          "value": "180000",
+          "value_type": "number",
+          "description": "Annual household income ≤ Rs. 1,80,000 (SECC-based)"
+        },
+        {
+          "field_name": "has_aadhaar",
+          "operator": "==",
+          "value": "true",
+          "value_type": "boolean",
+          "description": "Must have Aadhaar card"
+        },
+        {
+          "field_name": "has_bank_account",
+          "operator": "==",
+          "value": "true",
+          "value_type": "boolean",
+          "description": "Must have a bank account for DBT"
+        }
+      ],
+      "required_slots": [
+        {
+          "slot_name": "house_type",
+          "slot_type": "string",
+          "question_text_en": "What kind of house do you currently live in? Is it a permanent (pucca) house, a temporary (kutcha) house, or are you homeless?",
+          "question_text_hi": "आप अभी किस तरह के घर में रहते हैं? क्या यह पक्का घर है, कच्चा घर है, या आपके पास कोई घर नहीं है?",
+          "priority": 1
+        },
+        {
+          "slot_name": "residence_type",
+          "slot_type": "string",
+          "question_text_en": "Do you live in a village (rural area) or a city (urban area)?",
+          "question_text_hi": "क्या आप गाँव में रहते हैं या शहर में?",
+          "priority": 2
+        },
+        {
+          "slot_name": "annual_income",
+          "slot_type": "number",
+          "question_text_en": "What is your total yearly household income in rupees?",
+          "question_text_hi": "आपके परिवार की कुल वार्षिक आमदनी कितने रुपये है?",
+          "priority": 3
+        },
+        {
+          "slot_name": "has_aadhaar",
+          "slot_type": "boolean",
+          "question_text_en": "Do you have an Aadhaar card?",
+          "question_text_hi": "क्या आपके पास आधार कार्ड है?",
+          "priority": 4
+        },
+        {
+          "slot_name": "has_bank_account",
+          "slot_type": "boolean",
+          "question_text_en": "Do you have a bank account?",
+          "question_text_hi": "क्या आपके पास बैंक खाता है?",
+          "priority": 5
+        }
+      ]
+    }
+  ]
+}
