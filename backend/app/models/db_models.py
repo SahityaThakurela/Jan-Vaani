@@ -24,6 +24,24 @@ def _now() -> datetime:
 
 
 # ─────────────────────────────────────────────────────────────
+# 0. users
+# ─────────────────────────────────────────────────────────────
+class User(Base):
+    __tablename__ = "users"
+
+    user_id: Mapped[str] = mapped_column(String(64), primary_key=True, default=_uuid)
+    email: Mapped[str] = mapped_column(String(256), nullable=False, unique=True, index=True)
+    hashed_password: Mapped[str] = mapped_column(String(256), nullable=False)
+    full_name: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+    sessions: Mapped[list["Session"]] = relationship(
+        "Session", back_populates="user", cascade="all, delete-orphan"
+    )
+
+
+# ─────────────────────────────────────────────────────────────
 # 1. schemes
 # ─────────────────────────────────────────────────────────────
 class Scheme(Base):
@@ -101,6 +119,9 @@ class Session(Base):
     __tablename__ = "sessions"
 
     session_id: Mapped[str] = mapped_column(String(64), primary_key=True, default=_uuid)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        String(64), ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
     status: Mapped[str] = mapped_column(String(32), default="active")   # active | completed | handed_off
@@ -108,6 +129,7 @@ class Session(Base):
     current_scheme_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     current_state: Mapped[str] = mapped_column(String(64), default="IDLE")
 
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="sessions")
     profile_slots: Mapped[list["UserProfileSlot"]] = relationship(
         "UserProfileSlot", back_populates="session", cascade="all, delete-orphan"
     )

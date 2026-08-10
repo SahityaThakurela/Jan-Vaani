@@ -46,7 +46,7 @@ def _get_model(system_instruction: str = "") -> genai.GenerativeModel:
 async def classify_intent(
     user_text: str,
     language: str = "hi",
-    conversation_context: List[Dict[str, str]] | None = None,
+    conversation_context: Optional[List[Dict[str, str]]] = None,
 ) -> Dict[str, Any]:
     """
     Classify the user's intent from their spoken text.

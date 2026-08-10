@@ -5,14 +5,16 @@ GET  /sessions/{id}  → get session detail (history, profile, turns)
 DELETE /sessions/{id} → end session
 """
 import uuid
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.db.database import get_db
-from app.models.db_models import Session as DBSession, UserProfileSlot, ConversationTurn, HandoffRequest
+from app.models.db_models import Session as DBSession, UserProfileSlot, ConversationTurn, HandoffRequest, User
 from app.models.schemas import SessionCreate, SessionResponse, SessionDetailResponse, ProfileSlotOut, TurnOut
 from app.core.state_machine import get_state_machine, remove_state_machine
 from app.core.slot_manager import get_slot_manager, remove_slot_manager
+from app.core.auth import get_optional_user
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -23,6 +25,7 @@ router = APIRouter()
 async def create_session(
     payload: SessionCreate,
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Create a new user session. Returns session_id."""
     session_id = str(uuid.uuid4())
@@ -31,6 +34,7 @@ async def create_session(
         language=payload.language,
         status="active",
         current_state="IDLE",
+        user_id=current_user.user_id if current_user else None,
     )
     db.add(db_session)
     await db.commit()
@@ -40,7 +44,7 @@ async def create_session(
     get_state_machine(session_id)
     get_slot_manager(session_id)
 
-    logger.info(f"Session created: {session_id} [{payload.language}]")
+    logger.info(f"Session created: {session_id} [{payload.language}] user={current_user.email if current_user else 'anonymous'}")
     return db_session
 
 

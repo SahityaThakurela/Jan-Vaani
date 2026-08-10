@@ -58,6 +58,7 @@ async def trigger_handoff(
     db_session.current_state = SessionState.HANDOFF.value
     db_session.status = "handed_off"
     await db.commit()
+    await db.refresh(handoff)
 
     agent_text = await llm_service.compose_reply(
         "handoff",

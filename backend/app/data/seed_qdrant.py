@@ -15,8 +15,8 @@ import json
 import sys
 from pathlib import Path
 
-# Allow running as a script
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from typing import List
 
 from app.services.qdrant_service import qdrant_service
 from app.utils.logger import get_logger
@@ -98,7 +98,7 @@ async def seed():
     logger.info(f"Qdrant seeding complete. Total chunks upserted: {total_chunks}")
 
 
-def _chunk_text(text: str, max_chars: int = 400) -> list[str]:
+def _chunk_text(text: str, max_chars: int = 400) -> List[str]:
     """Split text into chunks of max_chars characters at sentence boundaries."""
     sentences = text.replace(". ", ".\n").replace("। ", "।\n").split("\n")
     chunks = []

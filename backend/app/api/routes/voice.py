@@ -12,7 +12,7 @@ POST /voice/interrupt
 """
 import json
 import uuid
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -84,7 +84,7 @@ async def voice_turn(
     intent_detected = None
     slots_extracted: Dict[str, Any] = {}
     eligibility_result: Optional[EligibilityResult] = None
-    cross_matches: list[CrossSchemeMatch] = []
+    cross_matches: List[CrossSchemeMatch] = []
     handoff_triggered = False
 
     # Get conversation history for context
@@ -421,25 +421,26 @@ async def _get_all_schemes_brief(db: AsyncSession):
     ]
 
 
-async def _get_scheme_slots(db: AsyncSession, scheme_id: str) -> list[dict]:
+async def _get_scheme_slots(db: AsyncSession, scheme_id: str) -> List[Dict[str, Any]]:
     result = await db.execute(
         select(SchemeRequiredSlot)
         .where(SchemeRequiredSlot.scheme_id == scheme_id)
         .order_by(SchemeRequiredSlot.priority)
     )
+    rows = result.scalars().all()
     return [
         {
-            "slot_name": s.slot_name,
-            "slot_type": s.slot_type,
-            "question_text_en": s.question_text_en,
-            "question_text_hi": s.question_text_hi,
-            "priority": s.priority,
+            "slot_name": r.slot_name,
+            "slot_type": r.slot_type,
+            "question_text_en": r.question_text_en,
+            "question_text_hi": r.question_text_hi,
+            "priority": r.priority,
         }
-        for s in result.scalars().all()
+        for r in rows
     ]
 
 
-async def _get_scheme_rules(db: AsyncSession, scheme_id: str) -> list[dict]:
+async def _get_scheme_rules(db: AsyncSession, scheme_id: str) -> List[Dict[str, Any]]:
     result = await db.execute(
         select(SchemeEligibilityRule).where(SchemeEligibilityRule.scheme_id == scheme_id)
     )

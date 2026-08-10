@@ -15,7 +15,7 @@ LLM/engine calls happen in the voice route, not in this module.
 """
 from __future__ import annotations
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -32,7 +32,7 @@ class SessionState(str, Enum):
 
 
 # Valid state transitions
-TRANSITIONS: Dict[SessionState, list[SessionState]] = {
+TRANSITIONS: Dict[SessionState, List[SessionState]] = {
     SessionState.IDLE: [
         SessionState.INTENT_CLASSIFICATION,
     ],

@@ -169,3 +169,36 @@ class SessionDetailResponse(BaseModel):
     profile: List[ProfileSlotOut]
     turns: List[TurnOut]
     handoffs: List[Dict[str, Any]]
+
+
+# ─────────────────────────────────────────────────────────────
+# Auth
+# ─────────────────────────────────────────────────────────────
+class UserRegister(BaseModel):
+    email: str = Field(..., description="User email address")
+    password: str = Field(..., min_length=6, description="Password (min 6 chars)")
+    full_name: Optional[str] = Field(default=None)
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user_id: str
+    email: str
+    full_name: Optional[str] = None
+
+
+class UserOut(BaseModel):
+    user_id: str
+    email: str
+    full_name: Optional[str] = None
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

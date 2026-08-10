@@ -11,7 +11,7 @@ DATABASE_URL = f"sqlite+aiosqlite:///{settings.sqlite_db_path}"
 
 engine = create_async_engine(
     DATABASE_URL,
-    echo=settings.is_development,
+    echo=False,
     connect_args={"check_same_thread": False},
 )
 

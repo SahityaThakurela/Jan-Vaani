@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     environment: str = "development"
     app_secret_key: str = "changeme"
 
+    # ── JWT Auth ─────────────────────────────────────────────
+    jwt_secret_key: str = "your-jwt-secret-change-me-in-production"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24 * 7   # 7 days for hackathon convenience
+
     # ── Database ─────────────────────────────────────────────
     sqlite_db_path: str = "./janvaani.db"
 
@@ -36,7 +41,7 @@ class Settings(BaseSettings):
 
     # ── Google Gemini ─────────────────────────────────────────
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash-exp"
+    gemini_model: str = "gemini-2.0-flash"          # stable model name
     gemini_embedding_model: str = "models/text-embedding-004"
 
     # ── Deepgram STT ──────────────────────────────────────────

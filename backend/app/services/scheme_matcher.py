@@ -4,7 +4,7 @@ Runs the deterministic eligibility engine across ALL schemes
 using the profile data collected so far, and returns a ranked
 list of other schemes the user qualifies for.
 """
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.db_models import Scheme, SchemeEligibilityRule, SchemeRequiredSlot
@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 async def run_cross_scheme_match(
     profile: Dict[str, Any],
     db: AsyncSession,
-    exclude_scheme_id: str | None = None,
+    exclude_scheme_id: Optional[str] = None,
 ) -> List[EligibilityDecision]:
     """
     Check the user's filled profile against every scheme in the DB.
