@@ -46,7 +46,6 @@ async def transcribe_audio(
 
     headers = {
         "Authorization": f"Token {settings.deepgram_api_key}",
-        "Content-Type": mimetype,
     }
 
     try:

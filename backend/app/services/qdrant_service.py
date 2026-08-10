@@ -12,7 +12,8 @@ NOTE: All methods fail gracefully if Qdrant is not running locally.
 import json
 import uuid
 from typing import Any, Dict, List, Optional
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from app.config import settings
 from app.utils.logger import get_logger
 
@@ -41,6 +42,7 @@ class QdrantService:
         self._client = None
         self._available = _QDRANT_AVAILABLE
         self._checked = False  # have we tried connecting yet?
+        self._gemini_client = None
 
     def _get_client(self):
         if not self._available:
@@ -51,33 +53,40 @@ class QdrantService:
                 kwargs["api_key"] = settings.qdrant_api_key
             self._client = AsyncQdrantClient(**kwargs)
         return self._client
+        
+    def _get_gemini_client(self) -> Optional[genai.Client]:
+        if not settings.gemini_api_key:
+            return None
+        if self._gemini_client is None:
+            self._gemini_client = genai.Client(api_key=settings.gemini_api_key)
+        return self._gemini_client
 
     async def _embed(self, text: str) -> List[float]:
         """Get embedding for text using Gemini text-embedding-004."""
-        if not settings.gemini_api_key:
+        gemini_client = self._get_gemini_client()
+        if not gemini_client:
             logger.warning("No Gemini API key set — returning zero embedding vector.")
             return [0.0] * settings.embedding_dim
 
-        genai.configure(api_key=settings.gemini_api_key)
-        result = genai.embed_content(
+        result = await gemini_client.aio.models.embed_content(
             model=settings.gemini_embedding_model,
-            content=text,
-            task_type="retrieval_document",
+            contents=text,
+            config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
         )
-        return result["embedding"]
+        return result.embeddings[0].values
 
     async def _embed_query(self, text: str) -> List[float]:
         """Get embedding for a search query."""
-        if not settings.gemini_api_key:
+        gemini_client = self._get_gemini_client()
+        if not gemini_client:
             return [0.0] * settings.embedding_dim
 
-        genai.configure(api_key=settings.gemini_api_key)
-        result = genai.embed_content(
+        result = await gemini_client.aio.models.embed_content(
             model=settings.gemini_embedding_model,
-            content=text,
-            task_type="retrieval_query",
+            contents=text,
+            config=types.EmbedContentConfig(task_type="RETRIEVAL_QUERY"),
         )
-        return result["embedding"]
+        return result.embeddings[0].values
 
     async def ensure_collections(self) -> bool:
         """Create Qdrant collections if they don't already exist. Returns True on success."""

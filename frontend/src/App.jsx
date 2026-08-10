@@ -121,7 +121,7 @@ export default function App() {
         await sendAudioTurn(audioBlob);
       };
 
-      mediaRecorderRef.current.start(100); // collect data every 100ms
+      mediaRecorderRef.current.start(); // collect data when stopped
       setRecording(true);
       setStatus('listening');
     } catch (err) {

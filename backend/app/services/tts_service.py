@@ -15,11 +15,7 @@ from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Voice mapping per language
-VOICE_MAP = {
-    "hi": "maya",    # Indian English voice — best for Hinglish/Hindi-inflected speech
-    "en": "aria",    # Standard English
-}
+# Use speaker defined in settings (e.g. maya for mist model)
 
 
 async def synthesize_speech(
@@ -42,7 +38,7 @@ async def synthesize_speech(
         logger.warning("No Rime API key — returning empty audio bytes.")
         return b""
 
-    speaker = VOICE_MAP.get(language, "maya")
+    speaker = settings.rime_speaker
 
     # Rime Coda: shape delivery through short sentences + punctuation
     # Ensure text ends with punctuation for natural cadence
