@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Mic, Square, PhoneOff, Sparkles,
   CheckCircle2, AlertTriangle, Headphones, LogOut, User,
-  Zap, Activity, Radio, ChevronRight
+  Zap, Activity, Radio, ChevronRight, StopCircle, History, X,
+  MessageSquare, Clock
 } from 'lucide-react';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -38,6 +39,21 @@ function getSlotIcon(key) {
   return SLOT_ICONS.default;
 }
 
+// ── Format date helper ────────────────────────────────────────
+// Backend stores datetimes as UTC but isoformat() has no 'Z' suffix.
+// Append 'Z' to force UTC interpretation → browser converts to local time.
+function formatDate(isoStr) {
+  if (!isoStr) return '';
+  const utcStr = isoStr.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(isoStr)
+    ? isoStr
+    : isoStr + 'Z';
+  const d = new Date(utcStr);
+  return d.toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: true
+  });
+}
+
 // ── Waveform component ────────────────────────────────────────
 function Waveform() {
   return (
@@ -52,7 +68,6 @@ function Waveform() {
 export default function App() {
   // Auth state
   const [authUser, setAuthUser] = useState(getStoredUser);
-
   const [authView, setAuthView] = useState('login');
 
   // App state
@@ -66,6 +81,16 @@ export default function App() {
   const [crossMatches, setCrossMatches] = useState([]);
   const [handoffData, setHandoffData] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [endingChat, setEndingChat] = useState(false);
+
+  // History panel state
+  const [showHistory, setShowHistory] = useState(false);
+  const [pastSessions, setPastSessions] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  // Transcript viewer state
+  const [viewingSession, setViewingSession] = useState(null); // {session, profile, turns}
+  const [viewLoading, setViewLoading] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -93,7 +118,28 @@ export default function App() {
     setLatestEligibility(null);
     setCrossMatches([]);
     setHandoffData(null);
+    setShowHistory(false);
+    setPastSessions([]);
   };
+
+  // ── Load profile from DB for a session ───────────────────────
+  const loadProfileFromDB = useCallback(async (sid) => {
+    if (!sid) return;
+    try {
+      const res = await fetch(`${API_BASE}/sessions/${sid}`, { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.profile && data.profile.length > 0) {
+        const profileMap = {};
+        data.profile.forEach(slot => {
+          profileMap[slot.slot_name] = slot.value;
+        });
+        setProfile(profileMap);
+      }
+    } catch (err) {
+      console.error('Profile load failed:', err);
+    }
+  }, []);
 
   const initSession = async (lang) => {
     try {
@@ -113,8 +159,72 @@ export default function App() {
       setLatestEligibility(null);
       setCrossMatches([]);
       setHandoffData(null);
+      // Load any existing profile slots for this new session (usually empty)
+      await loadProfileFromDB(data.session_id);
     } catch (err) {
       console.error('Session init failed:', err);
+    }
+  };
+
+  // ── End Chat ─────────────────────────────────────────────────
+  const handleEndChat = async () => {
+    if (!sessionId || endingChat) return;
+    setEndingChat(true);
+    try {
+      await fetch(`${API_BASE}/sessions/${sessionId}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+    } catch (err) {
+      console.error('End session failed:', err);
+    }
+    // Reset and start a new session
+    setTurns([]);
+    setProfile({});
+    setLatestEligibility(null);
+    setCrossMatches([]);
+    setHandoffData(null);
+    setSessionId(null);
+    setEndingChat(false);
+    await initSession(language);
+  };
+
+  // ── History panel ─────────────────────────────────────────────
+  const openHistory = async () => {
+    setShowHistory(true);
+    setHistoryLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/sessions`, { headers: authHeaders() });
+      if (res.status === 401) { handleLogout(); return; }
+      if (res.ok) {
+        const data = await res.json();
+        setPastSessions(data);
+      }
+    } catch (err) {
+      console.error('History load failed:', err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const closeHistory = () => {
+    setShowHistory(false);
+    setViewingSession(null);
+  };
+
+  const openSessionTranscript = async (sid) => {
+    setViewLoading(true);
+    setViewingSession({ loading: true });
+    try {
+      const res = await fetch(`${API_BASE}/sessions/${sid}`, { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      setViewingSession(data);
+    } catch (err) {
+      console.error('Session detail load failed:', err);
+      setViewingSession(null);
+    } finally {
+      setViewLoading(false);
     }
   };
 
@@ -171,10 +281,14 @@ export default function App() {
         agentText: data.agent_text,
         action: data.action_taken,
       }]);
+      // Merge slots from live response
       if (data.slots_extracted) setProfile(prev => ({ ...prev, ...data.slots_extracted }));
       if (data.eligibility_result) setLatestEligibility(data.eligibility_result);
       if (data.cross_scheme_matches) setCrossMatches(data.cross_scheme_matches);
       if (data.handoff_triggered) fetchHandoff(sessionId);
+
+      // Always re-fetch profile from DB after each turn to catch any DB-persisted slots
+      await loadProfileFromDB(sessionId);
 
       if (data.audio_b64) {
         setStatus('speaking');
@@ -231,33 +345,30 @@ export default function App() {
   }[status];
 
   // ── Auth guard ─────────────────────────────────────────────
-if (!authUser) {
-
-  if (authView === 'landing') {
+  if (!authUser) {
+    if (authView === 'landing') {
+      return (
+        <Landing
+          onGetStarted={() => setAuthView('register')}
+          onLogin={() => setAuthView('login')}
+        />
+      );
+    }
+    if (authView === 'login') {
+      return (
+        <Login
+          onAuthSuccess={handleAuthSuccess}
+          onGoRegister={() => setAuthView('register')}
+        />
+      );
+    }
     return (
-      <Landing
-        onGetStarted={() => setAuthView('register')}
-        onLogin={() => setAuthView('login')}
-      />
-    );
-  }
-
-  if (authView === 'login') {
-    return (
-      <Login
+      <Register
         onAuthSuccess={handleAuthSuccess}
-        onGoRegister={() => setAuthView('register')}
+        onGoLogin={() => setAuthView('login')}
       />
     );
   }
-
-  return (
-    <Register
-      onAuthSuccess={handleAuthSuccess}
-      onGoLogin={() => setAuthView('login')}
-    />
-  );
-}
 
   // ── Main App UI ────────────────────────────────────────────
   return (
@@ -288,6 +399,17 @@ if (!authUser) {
               onClick={() => setLanguage('en')}
             >English</button>
           </div>
+
+          {/* Previous Chats button */}
+          <button
+            id="history-btn"
+            className={`history-toggle-btn ${showHistory ? 'active' : ''}`}
+            onClick={showHistory ? closeHistory : openHistory}
+            title="View previous chats"
+          >
+            <History size={14} />
+            <span>{language === 'hi' ? 'पिछली चैट' : 'Previous Chats'}</span>
+          </button>
 
           <div className="user-pill">
             <User size={13} />
@@ -480,7 +602,7 @@ if (!authUser) {
             </div>
           )}
 
-          {/* Session Info */}
+          {/* Session Info + End Chat */}
           {sessionId && (
             <div className="glass-panel session-info-card">
               <p className="session-label">Session ID</p>
@@ -494,6 +616,21 @@ if (!authUser) {
                   <ChevronRight size={14} />
                   {language === 'hi' ? 'नया सत्र शुरू करें' : 'Start New Session'}
                 </span>
+              </button>
+
+              {/* End Chat Button */}
+              <button
+                id="end-chat-btn"
+                className="end-chat-btn"
+                onClick={handleEndChat}
+                disabled={endingChat || turns.length === 0}
+                title={turns.length === 0 ? 'No conversation to save' : 'End this chat and save it'}
+              >
+                <StopCircle size={14} />
+                {endingChat
+                  ? (language === 'hi' ? 'सहेजा जा रहा है…' : 'Saving…')
+                  : (language === 'hi' ? 'चैट समाप्त करें और सहेजें' : 'End Chat & Save')
+                }
               </button>
             </div>
           )}
@@ -544,15 +681,15 @@ if (!authUser) {
               {language === 'hi' ? 'क्या आप वाकई लॉगआउट करना चाहते हैं?' : 'Are you sure you want to logout?'}
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button 
-                className="close-btn" 
+              <button
+                className="close-btn"
                 style={{ marginTop: 0, flex: 1 }}
                 onClick={() => setShowLogoutConfirm(false)}
               >
                 {language === 'hi' ? 'रद्द करें' : 'Cancel'}
               </button>
-              <button 
-                className="close-btn" 
+              <button
+                className="close-btn"
                 style={{ marginTop: 0, flex: 1, background: 'rgba(255, 90, 90, 0.12)', borderColor: 'rgba(255, 90, 90, 0.3)', color: '#ff9090' }}
                 onClick={() => {
                   setShowLogoutConfirm(false);
@@ -560,6 +697,172 @@ if (!authUser) {
                 }}
               >
                 {language === 'hi' ? 'लॉगआउट' : 'Logout'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Previous Chats Drawer ── */}
+      {showHistory && (
+        <>
+          <div className="history-overlay" onClick={closeHistory} />
+          <div className="history-drawer">
+            <div className="history-drawer-header">
+              <div className="history-drawer-title">
+                <History size={18} color="var(--indigo)" />
+                {language === 'hi' ? 'पिछली चैट' : 'Previous Chats'}
+              </div>
+              <button className="history-drawer-close" onClick={closeHistory}>
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="history-list">
+              {historyLoading ? (
+                <div className="history-empty">
+                  <div className="history-empty-icon">⏳</div>
+                  <p style={{ fontSize: '0.85rem' }}>
+                    {language === 'hi' ? 'लोड हो रहा है…' : 'Loading sessions…'}
+                  </p>
+                </div>
+              ) : pastSessions.length === 0 ? (
+                <div className="history-empty">
+                  <div className="history-empty-icon">💬</div>
+                  <p style={{ fontSize: '0.85rem' }}>
+                    {language === 'hi'
+                      ? 'अभी कोई पिछली चैट नहीं है।'
+                      : 'No previous chats found.'}
+                  </p>
+                </div>
+              ) : (
+                pastSessions.map((s) => (
+                  <div
+                    key={s.session_id}
+                    className={`history-session-card ${s.session_id === sessionId ? 'current' : ''}`}
+                    onClick={() => openSessionTranscript(s.session_id)}
+                  >
+                    <div className={`history-session-icon ${s.status === 'completed' ? 'completed' : ''}`}>
+                      {s.status === 'completed' ? '✅' : '💬'}
+                    </div>
+                    <div className="history-session-info">
+                      <div className="history-session-date">
+                        {s.session_id === sessionId
+                          ? `⚡ ${language === 'hi' ? 'वर्तमान सत्र' : 'Current Session'}`
+                          : formatDate(s.created_at)
+                        }
+                      </div>
+                      <div className="history-session-meta">
+                        <span className={`history-session-badge ${s.status}`}>
+                          {s.status}
+                        </span>
+                        <span className="history-session-turns">
+                          <MessageSquare size={10} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 3 }} />
+                          {s.turn_count} {language === 'hi' ? 'बातें' : 'turns'}
+                        </span>
+                        <span className="history-session-turns">
+                          {s.language === 'hi' ? '🇮🇳 हिंदी' : '🇬🇧 English'}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight size={14} color="var(--text-muted)" />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Session Transcript Viewer Modal ── */}
+      {viewingSession && (
+        <div className="transcript-modal-overlay" onClick={() => setViewingSession(null)}>
+          <div className="transcript-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="transcript-modal-header">
+              <div>
+                <div className="transcript-modal-title">
+                  {viewingSession.loading
+                    ? (language === 'hi' ? 'लोड हो रहा है…' : 'Loading…')
+                    : `${language === 'hi' ? 'चैट' : 'Chat'} — ${viewingSession.session?.session_id?.slice(0, 16)}…`
+                  }
+                </div>
+                {!viewingSession.loading && viewingSession.session && (
+                  <div className="transcript-modal-subtitle">
+                    <Clock size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                    {formatDate(viewingSession.session.created_at)}
+                    {' · '}
+                    {viewingSession.session.language === 'hi' ? '🇮🇳 Hindi' : '🇬🇧 English'}
+                    {' · '}
+                    <span style={{ textTransform: 'capitalize' }}>{viewingSession.session.status}</span>
+                    {' · '}
+                    {viewingSession.turns?.length || 0} {language === 'hi' ? 'बातें' : 'turns'}
+                  </div>
+                )}
+              </div>
+              <button className="history-drawer-close" onClick={() => setViewingSession(null)}>
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="transcript-modal-body">
+              {viewingSession.loading ? (
+                <div className="transcript-loading">
+                  <span>⏳</span>
+                  <span>{language === 'hi' ? 'बातचीत लोड हो रही है…' : 'Loading conversation…'}</span>
+                </div>
+              ) : (
+                <>
+                  {/* Profile slots section */}
+                  {viewingSession.profile && viewingSession.profile.length > 0 && (
+                    <div style={{ marginBottom: 16 }}>
+                      <p style={{
+                        fontSize: '0.72rem', fontWeight: 700, letterSpacing: '1px',
+                        textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8
+                      }}>
+                        {language === 'hi' ? '📋 एकत्रित जानकारी' : '📋 Collected Profile'}
+                      </p>
+                      {viewingSession.profile.map(slot => (
+                        <div key={slot.slot_name} className="profile-slot-row">
+                          <span className="profile-slot-row-name">
+                            {getSlotIcon(slot.slot_name)} {slot.slot_name.replace(/_/g, ' ')}
+                          </span>
+                          <span className="profile-slot-row-val">{slot.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Conversation turns */}
+                  {(!viewingSession.turns || viewingSession.turns.length === 0) ? (
+                    <div className="transcript-empty" style={{ padding: '30px 0' }}>
+                      <div className="transcript-empty-icon">
+                        <Mic size={20} />
+                      </div>
+                      <p style={{ fontSize: '0.85rem' }}>
+                        {language === 'hi' ? 'इस सत्र में कोई बातचीत नहीं हुई।' : 'No conversations in this session.'}
+                      </p>
+                    </div>
+                  ) : (
+                    viewingSession.turns.map((t) => (
+                      <div key={t.turn_id} className="turn-card">
+                        {t.user_text && (
+                          <div className="chat-bubble user">{t.user_text}</div>
+                        )}
+                        {t.agent_text && (
+                          <div className={`chat-bubble agent ${viewingSession.session?.language === 'hi' ? 'hindi-text' : ''}`}>
+                            {t.agent_text}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="transcript-modal-footer">
+              <button className="modal-close-btn" onClick={() => setViewingSession(null)}>
+                {language === 'hi' ? 'बंद करें' : 'Close'}
               </button>
             </div>
           </div>

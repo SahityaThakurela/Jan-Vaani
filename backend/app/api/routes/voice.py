@@ -42,6 +42,20 @@ router = APIRouter()
 HANDOFF_CONFIDENCE_THRESHOLD = 0.45
 MAX_LOW_CONF_TURNS = 3
 
+# Common user profile fields extracted from every turn
+UNIVERSAL_PROFILE_SLOTS = [
+    {"slot_name": "age",        "slot_type": "number", "question_text_en": "What is the user's age in years?"},
+    {"slot_name": "gender",     "slot_type": "string", "question_text_en": "What is the user's gender? (male/female/other)"},
+    {"slot_name": "income",     "slot_type": "number", "question_text_en": "What is the user's annual household income in rupees?"},
+    {"slot_name": "land_acres", "slot_type": "number", "question_text_en": "How many acres of land does the user own?"},
+    {"slot_name": "caste",      "slot_type": "string", "question_text_en": "What is the user's caste category? (general/obc/sc/st)"},
+    {"slot_name": "state",      "slot_type": "string", "question_text_en": "Which Indian state does the user belong to?"},
+    {"slot_name": "occupation", "slot_type": "string", "question_text_en": "What is the user's occupation? (farmer/laborer/self-employed/etc)"},
+    {"slot_name": "name",       "slot_type": "string", "question_text_en": "What is the user's full name?"},
+    {"slot_name": "family_size","slot_type": "number", "question_text_en": "How many members are in the user's family?"},
+    {"slot_name": "bpl_status", "slot_type": "boolean","question_text_en": "Is the user below poverty line (BPL)? (true/false)"},
+]
+
 
 @router.post("/turn", response_model=VoiceTurnResponse)
 async def voice_turn(
@@ -278,7 +292,22 @@ async def voice_turn(
     audio_out = await tts_service.synthesize_speech(agent_text, language)
     audio_b64 = audio_bytes_to_base64(audio_out) if audio_out else ""
 
-    # ── 4. Persist turn + slots ────────────────────────────────
+    # ── 4. Universal profile slot extraction (runs every turn) ──
+    # Extract common profile facts from the user's utterance regardless of intent.
+    # This runs even when the deterministic eligibility engine is disabled.
+    try:
+        universal_extracted = await llm_service.extract_slots(
+            user_text, UNIVERSAL_PROFILE_SLOTS, language
+        )
+        if universal_extracted:
+            slot_mgr.fill_slots_from_dict(universal_extracted, confidence=0.85, source_turn_id=turn_id)
+            # Merge into slots_extracted so the frontend receives them in this response
+            slots_extracted = {**slots_extracted, **universal_extracted}
+            logger.info(f"[{session_id}] Universal slots extracted: {list(universal_extracted.keys())}")
+    except Exception as slot_err:
+        logger.warning(f"[{session_id}] Universal slot extraction failed (non-critical): {slot_err}")
+
+    # ── 5. Persist turn + slots ────────────────────────────────
     db.add(ConversationTurn(
         turn_id=turn_id,
         session_id=session_id,
