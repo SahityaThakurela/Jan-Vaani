@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Mail, Lock, Eye, EyeOff, User, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Mail, Lock, Eye, EyeOff, User, ArrowRight, AlertCircle, CheckCircle2, Mic } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -15,16 +15,8 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
-
+    if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/auth/register`, {
@@ -33,14 +25,13 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
         body: JSON.stringify({ email, password, full_name: fullName || null }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setError(data.detail || 'Registration failed. Please try again.');
-        return;
-      }
+      if (!res.ok) { setError(data.detail || 'Registration failed. Please try again.'); return; }
       localStorage.setItem('jv_token', data.access_token);
-      localStorage.setItem('jv_user', JSON.stringify({ user_id: data.user_id, email: data.email, full_name: data.full_name }));
+      localStorage.setItem('jv_user', JSON.stringify({
+        user_id: data.user_id, email: data.email, full_name: data.full_name
+      }));
       onAuthSuccess(data);
-    } catch (err) {
+    } catch {
       setError('Cannot connect to server. Make sure the backend is running.');
     } finally {
       setLoading(false);
@@ -49,19 +40,21 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
 
   // Password strength
   const pwdStrength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
-  const strengthColors = ['', '#ef4444', '#f59e0b', '#10b981'];
+  const strengthColors = ['', '#ff5a5a', '#ffb95f', 'var(--teal)'];
   const strengthLabels = ['', 'Weak', 'Fair', 'Strong'];
 
   return (
     <div className="auth-page">
-      <div className="auth-blob auth-blob-orange" />
-      <div className="auth-blob auth-blob-green" />
+      {/* Animated ambient orbs */}
+      <div className="auth-orb auth-orb-teal" />
+      <div className="auth-orb auth-orb-saffron" />
+      <div className="auth-orb auth-orb-indigo" />
 
       <div className="auth-card">
-        {/* Header */}
+        {/* Brand */}
         <div className="auth-brand">
           <div className="auth-brand-icon">
-            <Sparkles size={28} color="#fff" />
+            <Sparkles size={26} color="#003824" strokeWidth={2.5} />
           </div>
           <div>
             <h1 className="auth-brand-name">Jan Vaani</h1>
@@ -75,15 +68,20 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
         <form onSubmit={handleSubmit} className="auth-form">
           {error && (
             <div className="auth-error">
-              <AlertCircle size={16} />
+              <AlertCircle size={15} />
               <span>{error}</span>
             </div>
           )}
 
           <div className="auth-field">
-            <label className="auth-label">Full Name <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span></label>
+            <label className="auth-label">
+              Full Name{' '}
+              <span style={{ color: 'var(--text-muted)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>
+                (optional)
+              </span>
+            </label>
             <div className="auth-input-wrap">
-              <User size={16} className="auth-input-icon" />
+              <User size={15} className="auth-input-icon" />
               <input
                 id="register-name"
                 type="text"
@@ -99,7 +97,7 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
           <div className="auth-field">
             <label className="auth-label">Email Address</label>
             <div className="auth-input-wrap">
-              <Mail size={16} className="auth-input-icon" />
+              <Mail size={15} className="auth-input-icon" />
               <input
                 id="register-email"
                 type="email"
@@ -116,7 +114,7 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
           <div className="auth-field">
             <label className="auth-label">Password</label>
             <div className="auth-input-wrap">
-              <Lock size={16} className="auth-input-icon" />
+              <Lock size={15} className="auth-input-icon" />
               <input
                 id="register-password"
                 type={showPassword ? 'text' : 'password'}
@@ -133,19 +131,16 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
             {password.length > 0 && (
               <div className="pwd-strength-bar">
                 <div
                   className="pwd-strength-fill"
-                  style={{
-                    width: `${(pwdStrength / 3) * 100}%`,
-                    background: strengthColors[pwdStrength],
-                  }}
+                  style={{ width: `${(pwdStrength / 3) * 100}%`, background: strengthColors[pwdStrength] }}
                 />
-                <span style={{ color: strengthColors[pwdStrength], fontSize: '0.75rem', marginTop: '4px' }}>
+                <span style={{ color: strengthColors[pwdStrength], fontSize: '0.74rem', marginTop: '4px' }}>
                   {strengthLabels[pwdStrength]}
                 </span>
               </div>
@@ -155,7 +150,7 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
           <div className="auth-field">
             <label className="auth-label">Confirm Password</label>
             <div className="auth-input-wrap">
-              <Lock size={16} className="auth-input-icon" />
+              <Lock size={15} className="auth-input-icon" />
               <input
                 id="register-confirm-password"
                 type={showPassword ? 'text' : 'password'}
@@ -169,25 +164,20 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
               {confirmPassword.length > 0 && (
                 <span className="auth-match-indicator">
                   {password === confirmPassword
-                    ? <CheckCircle2 size={16} color="#10b981" />
-                    : <AlertCircle size={16} color="#ef4444" />}
+                    ? <CheckCircle2 size={15} color="var(--teal)" />
+                    : <AlertCircle size={15} color="var(--crimson)" />}
                 </span>
               )}
             </div>
           </div>
 
-          <button
-            id="register-submit"
-            type="submit"
-            className="auth-submit-btn"
-            disabled={loading}
-          >
+          <button id="register-submit" type="submit" className="auth-submit-btn" disabled={loading}>
             {loading ? (
               <span className="auth-spinner" />
             ) : (
               <>
                 Create Account
-                <ArrowRight size={18} />
+                <ArrowRight size={17} />
               </>
             )}
           </button>
@@ -195,17 +185,17 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
 
         <p className="auth-switch">
           Already have an account?{' '}
-          <button className="auth-link-btn" onClick={onGoLogin}>
-            Sign in
-          </button>
+          <button className="auth-link-btn" onClick={onGoLogin}>Sign in</button>
         </p>
 
         <div className="auth-divider">
           <span>Hackathon Demo</span>
         </div>
-        <p className="auth-demo-note">
-          Jan Vaani • StarForge Hackathon 2026 • Voice-first welfare AI
-        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <Mic size={11} style={{ color: 'rgba(78,222,163,0.4)' }} />
+          <p className="auth-demo-note">Jan Vaani · StarForge Hackathon 2026 · Voice-first welfare AI</p>
+        </div>
       </div>
     </div>
   );
