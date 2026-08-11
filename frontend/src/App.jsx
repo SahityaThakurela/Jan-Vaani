@@ -63,6 +63,7 @@ export default function App() {
   const [latestEligibility, setLatestEligibility] = useState(null);
   const [crossMatches, setCrossMatches] = useState([]);
   const [handoffData, setHandoffData] = useState(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -269,7 +270,7 @@ export default function App() {
             <span className="user-pill-name">
               {authUser.full_name || authUser.email.split('@')[0]}
             </span>
-            <button id="logout-btn" className="logout-btn" onClick={handleLogout} title="Sign out">
+            <button id="logout-btn" className="logout-btn" onClick={() => setShowLogoutConfirm(true)} title="Sign out">
               <LogOut size={13} />
             </button>
           </div>
@@ -504,6 +505,39 @@ export default function App() {
             <button className="close-btn" onClick={() => setHandoffData(null)}>
               Dismiss Handoff Screen
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Logout Confirmation Modal ── */}
+      {showLogoutConfirm && (
+        <div className="handoff-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="handoff-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '1.2rem', color: 'var(--text-white)', fontWeight: 800, marginBottom: '8px' }}>
+              {language === 'hi' ? 'लॉगआउट करें?' : 'Logout?'}
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
+              {language === 'hi' ? 'क्या आप वाकई लॉगआउट करना चाहते हैं?' : 'Are you sure you want to logout?'}
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button 
+                className="close-btn" 
+                style={{ marginTop: 0, flex: 1 }}
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                {language === 'hi' ? 'रद्द करें' : 'Cancel'}
+              </button>
+              <button 
+                className="close-btn" 
+                style={{ marginTop: 0, flex: 1, background: 'rgba(255, 90, 90, 0.12)', borderColor: 'rgba(255, 90, 90, 0.3)', color: '#ff9090' }}
+                onClick={() => {
+                  setShowLogoutConfirm(false);
+                  handleLogout();
+                }}
+              >
+                {language === 'hi' ? 'लॉगआउट' : 'Logout'}
+              </button>
+            </div>
           </div>
         </div>
       )}
