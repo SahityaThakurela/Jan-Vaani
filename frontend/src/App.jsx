@@ -7,6 +7,7 @@ import {
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './index.css';
+import Landing from './pages/Landing';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -51,6 +52,7 @@ function Waveform() {
 export default function App() {
   // Auth state
   const [authUser, setAuthUser] = useState(getStoredUser);
+
   const [authView, setAuthView] = useState('login');
 
   // App state
@@ -229,11 +231,33 @@ export default function App() {
   }[status];
 
   // ── Auth guard ─────────────────────────────────────────────
-  if (!authUser) {
-    return authView === 'login'
-      ? <Login onAuthSuccess={handleAuthSuccess} onGoRegister={() => setAuthView('register')} />
-      : <Register onAuthSuccess={handleAuthSuccess} onGoLogin={() => setAuthView('login')} />;
+if (!authUser) {
+
+  if (authView === 'landing') {
+    return (
+      <Landing
+        onGetStarted={() => setAuthView('register')}
+        onLogin={() => setAuthView('login')}
+      />
+    );
   }
+
+  if (authView === 'login') {
+    return (
+      <Login
+        onAuthSuccess={handleAuthSuccess}
+        onGoRegister={() => setAuthView('register')}
+      />
+    );
+  }
+
+  return (
+    <Register
+      onAuthSuccess={handleAuthSuccess}
+      onGoLogin={() => setAuthView('login')}
+    />
+  );
+}
 
   // ── Main App UI ────────────────────────────────────────────
   return (
