@@ -66,10 +66,9 @@ function Waveform() {
 }
 
 // ── Rural Character SVGs ──────────────────────────────────────
-function RuralFarmer() {
+function RuralFarmer({ className }) {
   return (
-    <svg viewBox="0 0 120 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-farmer">
-      {/* Sun */}
+    <svg viewBox="0 0 120 130" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <circle cx="90" cy="20" r="12" fill="#F5A623" opacity="0.85"/>
       <g stroke="#F5A623" strokeWidth="2" opacity="0.6">
         <line x1="90" y1="2" x2="90" y2="6"/>
@@ -77,148 +76,101 @@ function RuralFarmer() {
         <line x1="72" y1="20" x2="68" y2="20"/>
         <line x1="108" y1="20" x2="112" y2="20"/>
       </g>
-      {/* Cow body */}
       <ellipse cx="30" cy="88" rx="22" ry="13" fill="#E8D5B7"/>
       <ellipse cx="30" cy="88" rx="22" ry="13" fill="none" stroke="#C4A882" strokeWidth="1.5"/>
-      {/* Cow spots */}
       <ellipse cx="24" cy="84" rx="5" ry="4" fill="#C4A882" opacity="0.5"/>
       <ellipse cx="36" cy="92" rx="4" ry="3" fill="#C4A882" opacity="0.5"/>
-      {/* Cow head */}
       <ellipse cx="52" cy="82" rx="10" ry="9" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1.5"/>
-      {/* Cow ears */}
       <ellipse cx="47" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1"/>
       <ellipse cx="57" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1"/>
-      {/* Cow horns */}
       <path d="M44 74 Q40 65 43 62" stroke="#A0663A" strokeWidth="2" fill="none"/>
       <path d="M55 74 Q59 65 57 62" stroke="#A0663A" strokeWidth="2" fill="none"/>
-      {/* Cow legs */}
       <rect x="14" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
       <rect x="23" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
       <rect x="34" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
       <rect x="43" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
-      {/* Cow tail */}
       <path d="M8 86 Q2 80 6 74 Q8 72 10 76" stroke="#C4A882" strokeWidth="2" fill="none"/>
-      {/* Farmer sitting */}
-      <circle cx="72" cy="62" r="10" fill="#FDBF6F"/> {/* head */}
-      <path d="M62 58 Q72 48 82 58" fill="#D4720C"/> {/* turban */}
-      <circle cx="72" cy="50" r="4" fill="#D4720C"/> {/* turban top */}
-      {/* Eyes */}
+      <circle cx="72" cy="62" r="10" fill="#FDBF6F"/>
+      <path d="M62 58 Q72 48 82 58" fill="#D4720C"/>
+      <circle cx="72" cy="50" r="4" fill="#D4720C"/>
       <circle cx="69" cy="62" r="1.5" fill="#3D2B1F"/>
       <circle cx="75" cy="62" r="1.5" fill="#3D2B1F"/>
-      {/* Smile */}
       <path d="M68 66 Q72 70 76 66" stroke="#3D2B1F" strokeWidth="1.5" fill="none"/>
-      {/* Body - dhoti */}
       <path d="M65 72 Q72 68 79 72 L82 95 L62 95 Z" fill="#F5F0E8"/>
-      {/* Shirt */}
       <path d="M64 72 Q72 68 80 72 L79 82 L65 82 Z" fill="#E8803A"/>
-      {/* Arms */}
       <path d="M65 74 Q54 78 52 82" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none"/>
       <path d="M79 74 Q85 80 82 86" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none"/>
-      {/* Legs */}
       <path d="M65 95 L60 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round"/>
       <path d="M79 95 L84 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round"/>
-      {/* Green grass */}
       <ellipse cx="60" cy="118" rx="55" ry="5" fill="#2D6A4F" opacity="0.15"/>
     </svg>
   );
 }
 
-function RuralWomanWater() {
+function RuralWomanWater({ className }) {
   return (
-    <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-woman-water">
-      {/* Pot on head */}
+    <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <ellipse cx="40" cy="16" rx="18" ry="10" fill="#C1440E" opacity="0.9"/>
       <rect x="22" y="12" width="36" height="20" rx="2" fill="#C1440E"/>
       <ellipse cx="40" cy="32" rx="18" ry="8" fill="#A03008"/>
-      {/* Water ripple */}
       <ellipse cx="40" cy="14" rx="12" ry="5" fill="#87CEEB" opacity="0.6"/>
-      {/* Head cloth */}
       <ellipse cx="40" cy="42" rx="12" ry="6" fill="#D4720C" opacity="0.8"/>
-      {/* Head */}
       <circle cx="40" cy="52" r="13" fill="#FDBF6F"/>
-      {/* Hair bun */}
       <circle cx="40" cy="42" r="7" fill="#3D2B1F"/>
-      {/* Eyes */}
       <circle cx="36" cy="52" r="1.8" fill="#3D2B1F"/>
       <circle cx="44" cy="52" r="1.8" fill="#3D2B1F"/>
       <circle cx="36.5" cy="51.5" r="0.5" fill="white"/>
       <circle cx="44.5" cy="51.5" r="0.5" fill="white"/>
-      {/* Nose dot */}
       <circle cx="40" cy="56" r="0.8" fill="#A0663A"/>
-      {/* Smile */}
       <path d="M36 59 Q40 63 44 59" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
-      {/* Saree - upper body */}
       <path d="M28 65 Q40 60 52 65 L55 105 L25 105 Z" fill="#E8803A"/>
-      {/* Saree drape */}
       <path d="M52 65 Q58 70 55 80 L52 75 Z" fill="#D4720C"/>
-      {/* Border design */}
       <rect x="25" y="100" width="30" height="5" fill="#D4720C"/>
-      {/* Arms - raised to support pot */}
       <path d="M28 68 L22 45 L26 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
       <path d="M52 68 L58 45 L54 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      {/* Skirt/saree lower */}
       <path d="M25 105 Q30 130 35 135 L45 135 Q50 130 55 105 Z" fill="#E8803A"/>
-      {/* Feet */}
       <ellipse cx="35" cy="136" rx="7" ry="4" fill="#FDBF6F"/>
       <ellipse cx="45" cy="136" rx="7" ry="4" fill="#FDBF6F"/>
-      {/* Anklets */}
       <rect x="28" y="132" width="14" height="2" rx="1" fill="#E8C547"/>
       <rect x="38" y="132" width="14" height="2" rx="1" fill="#E8C547"/>
     </svg>
   );
 }
 
-function RuralPlanter() {
+function RuralPlanter({ className }) {
   return (
-    <svg viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-planter">
-      {/* Plant pot */}
+    <svg viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <path d="M72 110 L80 90 L100 90 L108 110 Z" fill="#C1440E" opacity="0.85"/>
       <ellipse cx="90" cy="90" rx="14" ry="6" fill="#A03008"/>
-      {/* Plant leaves */}
       <path d="M90 90 Q75 70 70 55 Q85 65 90 90" fill="#2D6A4F"/>
       <path d="M90 90 Q105 70 110 55 Q95 65 90 90" fill="#52B788"/>
       <path d="M90 90 Q80 75 75 65 Q88 72 90 90" fill="#1A4A2E"/>
-      {/* Watering can */}
       <rect x="10" y="68" width="22" height="16" rx="4" fill="#6B4226"/>
-      <path d="M32 74 Q45 72 48 78 Q45 84 32 80 Z" fill="#6B4226"/> {/* spout */}
-      {/* Water drops */}
+      <path d="M32 74 Q45 72 48 78 Q45 84 32 80 Z" fill="#6B4226"/>
       <circle cx="50" cy="82" r="2" fill="#87CEEB" opacity="0.8"/>
       <circle cx="54" cy="86" r="1.5" fill="#87CEEB" opacity="0.7"/>
       <circle cx="52" cy="91" r="1" fill="#87CEEB" opacity="0.6"/>
-      {/* Handle */}
       <path d="M10 68 Q5 62 10 56 L18 56 Q14 62 18 68" fill="#6B4226"/>
-      {/* Man head */}
       <circle cx="35" cy="35" r="12" fill="#FDBF6F"/>
-      {/* Hair */}
       <path d="M24 32 Q35 22 46 32" fill="#3D2B1F"/>
-      {/* Eyes */}
       <circle cx="31" cy="36" r="1.5" fill="#3D2B1F"/>
       <circle cx="39" cy="36" r="1.5" fill="#3D2B1F"/>
-      {/* Smile */}
       <path d="M30 41 Q35 45 40 41" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
-      {/* Body bent forward */}
       <path d="M28 47 Q35 44 42 47 L50 75 L20 75 Z" fill="#2D6A4F"/>
-      {/* Belt */}
       <rect x="20" y="70" width="30" height="4" rx="2" fill="#1A4A2E"/>
-      {/* Dhoti */}
       <path d="M20 75 L18 110 Q35 115 52 110 L50 75 Z" fill="#F5F0E8"/>
-      {/* Arm holding can - bent */}
       <path d="M28 50 Q18 60 12 72" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      {/* Other arm */}
       <path d="M42 50 Q48 58 46 65" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      {/* Feet */}
       <ellipse cx="24" cy="112" rx="8" ry="4" fill="#FDBF6F"/>
       <ellipse cx="46" cy="112" rx="8" ry="4" fill="#FDBF6F"/>
     </svg>
   );
 }
 
-function RuralHarvestWoman() {
+function RuralHarvestWoman({ className }) {
   return (
-    <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-harvest">
-      {/* Wheat basket */}
+    <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <ellipse cx="40" cy="18" rx="24" ry="10" fill="#E8C547" opacity="0.9"/>
-      {/* Wheat stalks */}
       <g stroke="#A0663A" strokeWidth="2">
         <line x1="30" y1="8" x2="24" y2="-2"/>
         <line x1="35" y1="6" x2="32" y2="-4"/>
@@ -226,53 +178,55 @@ function RuralHarvestWoman() {
         <line x1="45" y1="6" x2="48" y2="-4"/>
         <line x1="50" y1="8" x2="56" y2="-2"/>
       </g>
-      {/* Wheat heads */}
       <ellipse cx="24" cy="-3" rx="4" ry="7" fill="#E8C547"/>
       <ellipse cx="32" cy="-5" rx="3" ry="6" fill="#D4A020"/>
       <ellipse cx="40" cy="-6" rx="4" ry="7" fill="#E8C547"/>
       <ellipse cx="48" cy="-5" rx="3" ry="6" fill="#D4A020"/>
       <ellipse cx="56" cy="-3" rx="4" ry="7" fill="#E8C547"/>
-      {/* Basket body */}
       <path d="M16 14 L20 36 L60 36 L64 14 Z" fill="#C1440E" opacity="0.8"/>
       <ellipse cx="40" cy="36" rx="20" ry="7" fill="#A03008"/>
-      {/* Basket pattern */}
       <path d="M20 20 L60 20" stroke="#A03008" strokeWidth="1" opacity="0.5"/>
       <path d="M19 26 L61 26" stroke="#A03008" strokeWidth="1" opacity="0.5"/>
-      {/* Cloth on head */}
       <ellipse cx="40" cy="46" rx="13" ry="7" fill="#E8803A" opacity="0.8"/>
-      {/* Head */}
       <circle cx="40" cy="56" r="13" fill="#FDBF6F"/>
-      {/* Hair */}
       <circle cx="40" cy="46" r="8" fill="#3D2B1F"/>
-      {/* Earrings */}
       <circle cx="28" cy="56" r="2.5" fill="#E8C547"/>
       <circle cx="52" cy="56" r="2.5" fill="#E8C547"/>
-      {/* Eyes */}
       <circle cx="36" cy="55" r="1.8" fill="#3D2B1F"/>
       <circle cx="44" cy="55" r="1.8" fill="#3D2B1F"/>
       <circle cx="36.5" cy="54.5" r="0.5" fill="white"/>
-      {/* Bindi */}
       <circle cx="40" cy="51" r="1.2" fill="#C1440E"/>
-      {/* Smile */}
       <path d="M35 60 Q40 64 45 60" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
-      {/* Saree blouse */}
       <path d="M28 69 Q40 63 52 69 L54 88 L26 88 Z" fill="#C1440E"/>
-      {/* Saree drape */}
       <path d="M52 69 Q58 72 56 82 L52 78 Z" fill="#A03008"/>
-      {/* Arms raised */}
       <path d="M28 70 L24 47 L28 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
       <path d="M52 70 L56 47 L52 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      {/* Saree skirt */}
       <path d="M26 88 Q28 118 32 128 L48 128 Q52 118 54 88 Z" fill="#E8803A"/>
-      {/* Border */}
       <rect x="26" y="120" width="28" height="5" fill="#C1440E"/>
-      {/* Feet */}
       <ellipse cx="33" cy="130" rx="7" ry="4" fill="#FDBF6F"/>
       <ellipse cx="47" cy="130" rx="7" ry="4" fill="#FDBF6F"/>
-      {/* Toe rings */}
       <rect x="29" y="128" width="8" height="1.5" rx="1" fill="#E8C547"/>
       <rect x="43" y="128" width="8" height="1.5" rx="1" fill="#E8C547"/>
     </svg>
+  );
+}
+
+// ── Premium Abstract Elements ───────────────────────────────────
+function FloatingElements() {
+  return (
+    <>
+      {/* Aesthetic glowing background orbs */}
+      <div className="glass-blob blob-1" />
+      <div className="glass-blob blob-2" />
+      <div className="glass-blob blob-3" />
+      <div className="glass-blob blob-4" />
+
+      {/* SVG Characters with modern layout */}
+      <RuralFarmer className="floating-svg img-1" />
+      <RuralWomanWater className="floating-svg img-2" />
+      <RuralPlanter className="floating-svg img-3" />
+      <RuralHarvestWoman className="floating-svg img-4" />
+    </>
   );
 }
 
@@ -824,11 +778,8 @@ export default function App() {
           <div className="voice-hero unified-mic-section">
             <div className="rural-scene">
 
-              {/* Rural Characters arranged around mic */}
-              <RuralFarmer />
-              <RuralWomanWater />
-              <RuralPlanter />
-              <RuralHarvestWoman />
+              {/* Premium Floating Orbs & Icons arranged around mic */}
+              <FloatingElements />
 
               {/* Mic in the center */}
               <div className="mic-center-area">
