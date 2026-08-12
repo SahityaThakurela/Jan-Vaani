@@ -92,6 +92,8 @@ export default function App() {
   // Transcript viewer state
   const [viewingSession, setViewingSession] = useState(null); // {session, profile, turns}
   const [viewLoading, setViewLoading] = useState(false);
+  const [sessionActionLoading, setSessionActionLoading] = useState(false);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -248,7 +250,73 @@ export default function App() {
     }
   };
 
-  const startRecording = async () => {
+  // ── End a viewed session (mark completed) ───────────────────
+  const handleEndViewingSession = async () => {
+    if (!viewingSession?.session?.session_id || sessionActionLoading) return;
+    const sid = viewingSession.session.session_id;
+    setSessionActionLoading(true);
+    try {
+      await fetch(`${API_BASE}/sessions/${sid}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+      setViewingSession(prev => ({
+        ...prev,
+        session: { ...prev.session, status: 'completed' },
+      }));
+      const res = await fetch(`${API_BASE}/sessions`, { headers: authHeaders() });
+      if (res.ok) setPastSessions(await res.json());
+    } catch (err) {
+      console.error('End session failed:', err);
+    } finally {
+      setSessionActionLoading(false);
+      setShowEndConfirm(false);
+    }
+  };
+
+  // ── Continue a viewed session ────────────────────────────────
+  const handleContinueSession = async () => {
+    if (!viewingSession?.session?.session_id || sessionActionLoading) return;
+    const sid = viewingSession.session.session_id;
+    setSessionActionLoading(true);
+    try {
+      const patchRes = await fetch(`${API_BASE}/sessions/${sid}/reactivate`, {
+        method: 'PATCH',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+      });
+      if (!patchRes.ok) {
+        console.error('Reactivate failed:', await patchRes.text());
+        setSessionActionLoading(false);
+        return;
+      }
+      const turns = (viewingSession.turns || []).map((t, i) => ({
+        id: t.turn_id || i,
+        userText: t.user_text,
+        agentText: t.agent_text,
+        action: t.action_taken,
+      }));
+      const profileMap = {};
+      (viewingSession.profile || []).forEach(slot => {
+        profileMap[slot.slot_name] = slot.value;
+      });
+      setSessionId(sid);
+      setTurns(turns);
+      setProfile(profileMap);
+      setLatestEligibility(null);
+      setCrossMatches([]);
+      setHandoffData(null);
+      const res = await fetch(`${API_BASE}/sessions`, { headers: authHeaders() });
+      if (res.ok) setPastSessions(await res.json());
+      setViewingSession(null);
+      setShowHistory(false);
+    } catch (err) {
+      console.error('Continue session failed:', err);
+    } finally {
+      setSessionActionLoading(false);
+    }
+  };
+
+    const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -930,6 +998,83 @@ export default function App() {
             <div className="transcript-modal-footer">
               <button className="modal-close-btn" onClick={() => setViewingSession(null)}>
                 {language === 'hi' ? 'बंद करें' : 'Close'}
+              </button>
+
+              <div className="transcript-modal-footer-actions">
+                {/* End / Continue for active non-current sessions */}
+                {!viewingSession.loading && viewingSession.session &&
+                 viewingSession.session.session_id !== sessionId &&
+                 viewingSession.session.status !== 'completed' && (
+                  <>
+                    <button
+                      className="modal-action-btn modal-end-btn"
+                      onClick={() => setShowEndConfirm(true)}
+                      disabled={sessionActionLoading}
+                      title={language === 'hi' ? 'इस सत्र को समाप्त करें' : 'Mark this session as completed'}
+                    >
+                      <StopCircle size={14} />
+                      {sessionActionLoading
+                        ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
+                        : (language === 'hi' ? 'समाप्त करें' : 'End Session')}
+                    </button>
+                    <button
+                      className="modal-action-btn modal-continue-btn"
+                      onClick={handleContinueSession}
+                      disabled={sessionActionLoading}
+                      title={language === 'hi' ? 'इस सत्र को जारी रखें' : 'Continue this chat session'}
+                    >
+                      <ChevronRight size={14} />
+                      {sessionActionLoading
+                        ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
+                        : (language === 'hi' ? 'जारी रखें' : 'Continue')}
+                    </button>
+                  </>
+                )}
+
+                {/* Completed badge (read-only) */}
+                {!viewingSession.loading && viewingSession.session &&
+                 viewingSession.session.status === 'completed' && (
+                  <span className="modal-completed-badge">
+                    <CheckCircle2 size={13} />
+                    {language === 'hi' ? 'पूर्ण' : 'Completed'}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── Confirm End Session Modal ── */}
+      {showEndConfirm && (
+        <div className="handoff-overlay" onClick={() => setShowEndConfirm(false)}>
+          <div className="handoff-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center' }}>
+            <div style={{ marginBottom: 16, fontSize: '2rem' }}>⚠️</div>
+            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-white)', fontWeight: 800, marginBottom: '8px' }}>
+              {language === 'hi' ? 'सत्र समाप्त करें?' : 'End Session?'}
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '24px', lineHeight: 1.6 }}>
+              {language === 'hi'
+                ? 'क्या आप इस चैट सत्र को पूर्ण के रूप में चिह्नित करना चाहते हैं?'
+                : 'Are you sure you want to mark this chat session as completed? This will close it permanently.'}
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                className="close-btn"
+                style={{ marginTop: 0, flex: 1 }}
+                onClick={() => setShowEndConfirm(false)}
+                disabled={sessionActionLoading}
+              >
+                {language === 'hi' ? 'रद्द करें' : 'Cancel'}
+              </button>
+              <button
+                className="close-btn"
+                style={{ marginTop: 0, flex: 1, background: 'rgba(255, 90, 90, 0.12)', borderColor: 'rgba(255, 90, 90, 0.3)', color: '#ff9090' }}
+                onClick={handleEndViewingSession}
+                disabled={sessionActionLoading}
+              >
+                {sessionActionLoading
+                  ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
+                  : (language === 'hi' ? 'हाँ, समाप्त करें' : 'Yes, End It')}
               </button>
             </div>
           </div>

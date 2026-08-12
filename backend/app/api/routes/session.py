@@ -147,3 +147,33 @@ async def end_session(
     remove_state_machine(session_id)
     remove_slot_manager(session_id)
     logger.info(f"Session ended: {session_id}")
+
+
+@router.patch("/{session_id}/reactivate", status_code=200)
+async def reactivate_session(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Reactivate a session so the user can continue from where they left off."""
+    result = await db.execute(
+        select(DBSession).where(
+            DBSession.session_id == session_id,
+            DBSession.user_id == current_user.user_id,
+        )
+    )
+    db_session = result.scalar_one_or_none()
+    if not db_session:
+        raise HTTPException(status_code=404, detail="Session not found.")
+
+    db_session.status = "active"
+    await db.commit()
+    await db.refresh(db_session)
+
+    # Re-initialize in-memory managers so voice turns work again
+    get_state_machine(session_id)
+    get_slot_manager(session_id)
+
+    logger.info(f"Session reactivated: {session_id} by user {current_user.email}")
+    return {"session_id": session_id, "status": "active"}
+
