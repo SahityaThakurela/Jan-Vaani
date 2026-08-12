@@ -1,24 +1,59 @@
 """
 Jan Vaani — Session Routes
+GET  /sessions        → list sessions for authenticated user
 POST /sessions        → create session
 GET  /sessions/{id}  → get session detail (history, profile, turns)
 DELETE /sessions/{id} → end session
 """
 import uuid
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from app.db.database import get_db
 from app.models.db_models import Session as DBSession, UserProfileSlot, ConversationTurn, HandoffRequest, User
 from app.models.schemas import SessionCreate, SessionResponse, SessionDetailResponse, ProfileSlotOut, TurnOut
 from app.core.state_machine import get_state_machine, remove_state_machine
 from app.core.slot_manager import get_slot_manager, remove_slot_manager
-from app.core.auth import get_optional_user
+from app.core.auth import get_optional_user, get_current_user
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter()
+
+
+@router.get("", tags=["Sessions"])
+async def list_sessions(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List all sessions for the authenticated user, newest first, with turn counts."""
+    result = await db.execute(
+        select(DBSession)
+        .where(DBSession.user_id == current_user.user_id)
+        .order_by(DBSession.created_at.desc())
+    )
+    sessions = result.scalars().all()
+
+    session_list = []
+    for s in sessions:
+        turns_count_result = await db.execute(
+            select(func.count(ConversationTurn.turn_id))
+            .where(ConversationTurn.session_id == s.session_id)
+        )
+        turn_count = turns_count_result.scalar() or 0
+        session_list.append({
+            "session_id": s.session_id,
+            "language": s.language,
+            "status": s.status,
+            "current_state": s.current_state,
+            "created_at": s.created_at.isoformat(),
+            "updated_at": s.updated_at.isoformat(),
+            "turn_count": turn_count,
+        })
+
+    logger.info(f"Listed {len(session_list)} sessions for user {current_user.email}")
+    return session_list
 
 
 @router.post("", response_model=SessionResponse, status_code=201)
