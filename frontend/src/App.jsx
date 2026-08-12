@@ -65,6 +65,255 @@ function Waveform() {
   );
 }
 
+// ── Rural Character SVGs ──────────────────────────────────────
+function RuralFarmer() {
+  return (
+    <svg viewBox="0 0 120 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-farmer">
+      {/* Sun */}
+      <circle cx="90" cy="20" r="12" fill="#F5A623" opacity="0.85"/>
+      <g stroke="#F5A623" strokeWidth="2" opacity="0.6">
+        <line x1="90" y1="2" x2="90" y2="6"/>
+        <line x1="90" y1="34" x2="90" y2="38"/>
+        <line x1="72" y1="20" x2="68" y2="20"/>
+        <line x1="108" y1="20" x2="112" y2="20"/>
+      </g>
+      {/* Cow body */}
+      <ellipse cx="30" cy="88" rx="22" ry="13" fill="#E8D5B7"/>
+      <ellipse cx="30" cy="88" rx="22" ry="13" fill="none" stroke="#C4A882" strokeWidth="1.5"/>
+      {/* Cow spots */}
+      <ellipse cx="24" cy="84" rx="5" ry="4" fill="#C4A882" opacity="0.5"/>
+      <ellipse cx="36" cy="92" rx="4" ry="3" fill="#C4A882" opacity="0.5"/>
+      {/* Cow head */}
+      <ellipse cx="52" cy="82" rx="10" ry="9" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1.5"/>
+      {/* Cow ears */}
+      <ellipse cx="47" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1"/>
+      <ellipse cx="57" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1"/>
+      {/* Cow horns */}
+      <path d="M44 74 Q40 65 43 62" stroke="#A0663A" strokeWidth="2" fill="none"/>
+      <path d="M55 74 Q59 65 57 62" stroke="#A0663A" strokeWidth="2" fill="none"/>
+      {/* Cow legs */}
+      <rect x="14" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
+      <rect x="23" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
+      <rect x="34" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
+      <rect x="43" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
+      {/* Cow tail */}
+      <path d="M8 86 Q2 80 6 74 Q8 72 10 76" stroke="#C4A882" strokeWidth="2" fill="none"/>
+      {/* Farmer sitting */}
+      <circle cx="72" cy="62" r="10" fill="#FDBF6F"/> {/* head */}
+      <path d="M62 58 Q72 48 82 58" fill="#D4720C"/> {/* turban */}
+      <circle cx="72" cy="50" r="4" fill="#D4720C"/> {/* turban top */}
+      {/* Eyes */}
+      <circle cx="69" cy="62" r="1.5" fill="#3D2B1F"/>
+      <circle cx="75" cy="62" r="1.5" fill="#3D2B1F"/>
+      {/* Smile */}
+      <path d="M68 66 Q72 70 76 66" stroke="#3D2B1F" strokeWidth="1.5" fill="none"/>
+      {/* Body - dhoti */}
+      <path d="M65 72 Q72 68 79 72 L82 95 L62 95 Z" fill="#F5F0E8"/>
+      {/* Shirt */}
+      <path d="M64 72 Q72 68 80 72 L79 82 L65 82 Z" fill="#E8803A"/>
+      {/* Arms */}
+      <path d="M65 74 Q54 78 52 82" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none"/>
+      <path d="M79 74 Q85 80 82 86" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none"/>
+      {/* Legs */}
+      <path d="M65 95 L60 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round"/>
+      <path d="M79 95 L84 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round"/>
+      {/* Green grass */}
+      <ellipse cx="60" cy="118" rx="55" ry="5" fill="#2D6A4F" opacity="0.15"/>
+    </svg>
+  );
+}
+
+function RuralWomanWater() {
+  return (
+    <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-woman-water">
+      {/* Pot on head */}
+      <ellipse cx="40" cy="16" rx="18" ry="10" fill="#C1440E" opacity="0.9"/>
+      <rect x="22" y="12" width="36" height="20" rx="2" fill="#C1440E"/>
+      <ellipse cx="40" cy="32" rx="18" ry="8" fill="#A03008"/>
+      {/* Water ripple */}
+      <ellipse cx="40" cy="14" rx="12" ry="5" fill="#87CEEB" opacity="0.6"/>
+      {/* Head cloth */}
+      <ellipse cx="40" cy="42" rx="12" ry="6" fill="#D4720C" opacity="0.8"/>
+      {/* Head */}
+      <circle cx="40" cy="52" r="13" fill="#FDBF6F"/>
+      {/* Hair bun */}
+      <circle cx="40" cy="42" r="7" fill="#3D2B1F"/>
+      {/* Eyes */}
+      <circle cx="36" cy="52" r="1.8" fill="#3D2B1F"/>
+      <circle cx="44" cy="52" r="1.8" fill="#3D2B1F"/>
+      <circle cx="36.5" cy="51.5" r="0.5" fill="white"/>
+      <circle cx="44.5" cy="51.5" r="0.5" fill="white"/>
+      {/* Nose dot */}
+      <circle cx="40" cy="56" r="0.8" fill="#A0663A"/>
+      {/* Smile */}
+      <path d="M36 59 Q40 63 44 59" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
+      {/* Saree - upper body */}
+      <path d="M28 65 Q40 60 52 65 L55 105 L25 105 Z" fill="#E8803A"/>
+      {/* Saree drape */}
+      <path d="M52 65 Q58 70 55 80 L52 75 Z" fill="#D4720C"/>
+      {/* Border design */}
+      <rect x="25" y="100" width="30" height="5" fill="#D4720C"/>
+      {/* Arms - raised to support pot */}
+      <path d="M28 68 L22 45 L26 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
+      <path d="M52 68 L58 45 L54 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
+      {/* Skirt/saree lower */}
+      <path d="M25 105 Q30 130 35 135 L45 135 Q50 130 55 105 Z" fill="#E8803A"/>
+      {/* Feet */}
+      <ellipse cx="35" cy="136" rx="7" ry="4" fill="#FDBF6F"/>
+      <ellipse cx="45" cy="136" rx="7" ry="4" fill="#FDBF6F"/>
+      {/* Anklets */}
+      <rect x="28" y="132" width="14" height="2" rx="1" fill="#E8C547"/>
+      <rect x="38" y="132" width="14" height="2" rx="1" fill="#E8C547"/>
+    </svg>
+  );
+}
+
+function RuralPlanter() {
+  return (
+    <svg viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-planter">
+      {/* Plant pot */}
+      <path d="M72 110 L80 90 L100 90 L108 110 Z" fill="#C1440E" opacity="0.85"/>
+      <ellipse cx="90" cy="90" rx="14" ry="6" fill="#A03008"/>
+      {/* Plant leaves */}
+      <path d="M90 90 Q75 70 70 55 Q85 65 90 90" fill="#2D6A4F"/>
+      <path d="M90 90 Q105 70 110 55 Q95 65 90 90" fill="#52B788"/>
+      <path d="M90 90 Q80 75 75 65 Q88 72 90 90" fill="#1A4A2E"/>
+      {/* Watering can */}
+      <rect x="10" y="68" width="22" height="16" rx="4" fill="#6B4226"/>
+      <path d="M32 74 Q45 72 48 78 Q45 84 32 80 Z" fill="#6B4226"/> {/* spout */}
+      {/* Water drops */}
+      <circle cx="50" cy="82" r="2" fill="#87CEEB" opacity="0.8"/>
+      <circle cx="54" cy="86" r="1.5" fill="#87CEEB" opacity="0.7"/>
+      <circle cx="52" cy="91" r="1" fill="#87CEEB" opacity="0.6"/>
+      {/* Handle */}
+      <path d="M10 68 Q5 62 10 56 L18 56 Q14 62 18 68" fill="#6B4226"/>
+      {/* Man head */}
+      <circle cx="35" cy="35" r="12" fill="#FDBF6F"/>
+      {/* Hair */}
+      <path d="M24 32 Q35 22 46 32" fill="#3D2B1F"/>
+      {/* Eyes */}
+      <circle cx="31" cy="36" r="1.5" fill="#3D2B1F"/>
+      <circle cx="39" cy="36" r="1.5" fill="#3D2B1F"/>
+      {/* Smile */}
+      <path d="M30 41 Q35 45 40 41" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
+      {/* Body bent forward */}
+      <path d="M28 47 Q35 44 42 47 L50 75 L20 75 Z" fill="#2D6A4F"/>
+      {/* Belt */}
+      <rect x="20" y="70" width="30" height="4" rx="2" fill="#1A4A2E"/>
+      {/* Dhoti */}
+      <path d="M20 75 L18 110 Q35 115 52 110 L50 75 Z" fill="#F5F0E8"/>
+      {/* Arm holding can - bent */}
+      <path d="M28 50 Q18 60 12 72" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
+      {/* Other arm */}
+      <path d="M42 50 Q48 58 46 65" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
+      {/* Feet */}
+      <ellipse cx="24" cy="112" rx="8" ry="4" fill="#FDBF6F"/>
+      <ellipse cx="46" cy="112" rx="8" ry="4" fill="#FDBF6F"/>
+    </svg>
+  );
+}
+
+function RuralHarvestWoman() {
+  return (
+    <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="rural-char rural-char-harvest">
+      {/* Wheat basket */}
+      <ellipse cx="40" cy="18" rx="24" ry="10" fill="#E8C547" opacity="0.9"/>
+      {/* Wheat stalks */}
+      <g stroke="#A0663A" strokeWidth="2">
+        <line x1="30" y1="8" x2="24" y2="-2"/>
+        <line x1="35" y1="6" x2="32" y2="-4"/>
+        <line x1="40" y1="5" x2="40" y2="-5"/>
+        <line x1="45" y1="6" x2="48" y2="-4"/>
+        <line x1="50" y1="8" x2="56" y2="-2"/>
+      </g>
+      {/* Wheat heads */}
+      <ellipse cx="24" cy="-3" rx="4" ry="7" fill="#E8C547"/>
+      <ellipse cx="32" cy="-5" rx="3" ry="6" fill="#D4A020"/>
+      <ellipse cx="40" cy="-6" rx="4" ry="7" fill="#E8C547"/>
+      <ellipse cx="48" cy="-5" rx="3" ry="6" fill="#D4A020"/>
+      <ellipse cx="56" cy="-3" rx="4" ry="7" fill="#E8C547"/>
+      {/* Basket body */}
+      <path d="M16 14 L20 36 L60 36 L64 14 Z" fill="#C1440E" opacity="0.8"/>
+      <ellipse cx="40" cy="36" rx="20" ry="7" fill="#A03008"/>
+      {/* Basket pattern */}
+      <path d="M20 20 L60 20" stroke="#A03008" strokeWidth="1" opacity="0.5"/>
+      <path d="M19 26 L61 26" stroke="#A03008" strokeWidth="1" opacity="0.5"/>
+      {/* Cloth on head */}
+      <ellipse cx="40" cy="46" rx="13" ry="7" fill="#E8803A" opacity="0.8"/>
+      {/* Head */}
+      <circle cx="40" cy="56" r="13" fill="#FDBF6F"/>
+      {/* Hair */}
+      <circle cx="40" cy="46" r="8" fill="#3D2B1F"/>
+      {/* Earrings */}
+      <circle cx="28" cy="56" r="2.5" fill="#E8C547"/>
+      <circle cx="52" cy="56" r="2.5" fill="#E8C547"/>
+      {/* Eyes */}
+      <circle cx="36" cy="55" r="1.8" fill="#3D2B1F"/>
+      <circle cx="44" cy="55" r="1.8" fill="#3D2B1F"/>
+      <circle cx="36.5" cy="54.5" r="0.5" fill="white"/>
+      {/* Bindi */}
+      <circle cx="40" cy="51" r="1.2" fill="#C1440E"/>
+      {/* Smile */}
+      <path d="M35 60 Q40 64 45 60" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
+      {/* Saree blouse */}
+      <path d="M28 69 Q40 63 52 69 L54 88 L26 88 Z" fill="#C1440E"/>
+      {/* Saree drape */}
+      <path d="M52 69 Q58 72 56 82 L52 78 Z" fill="#A03008"/>
+      {/* Arms raised */}
+      <path d="M28 70 L24 47 L28 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
+      <path d="M52 70 L56 47 L52 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
+      {/* Saree skirt */}
+      <path d="M26 88 Q28 118 32 128 L48 128 Q52 118 54 88 Z" fill="#E8803A"/>
+      {/* Border */}
+      <rect x="26" y="120" width="28" height="5" fill="#C1440E"/>
+      {/* Feet */}
+      <ellipse cx="33" cy="130" rx="7" ry="4" fill="#FDBF6F"/>
+      <ellipse cx="47" cy="130" rx="7" ry="4" fill="#FDBF6F"/>
+      {/* Toe rings */}
+      <rect x="29" y="128" width="8" height="1.5" rx="1" fill="#E8C547"/>
+      <rect x="43" y="128" width="8" height="1.5" rx="1" fill="#E8C547"/>
+    </svg>
+  );
+}
+
+
+// ── Typewriter component ────────────────────────────────────────
+function TypewriterText({ texts, speed = 50, pause = 2000 }) {
+  const [textIndex, setTextIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    const currentText = texts[textIndex];
+    
+    if (isDeleting) {
+      if (displayedText === '') {
+        setIsDeleting(false);
+        setTextIndex((prev) => (prev + 1) % texts.length);
+        timer = setTimeout(() => {}, 500);
+      } else {
+        timer = setTimeout(() => {
+          setDisplayedText(currentText.substring(0, displayedText.length - 1));
+        }, speed / 2);
+      }
+    } else {
+      if (displayedText === currentText) {
+        timer = setTimeout(() => {
+          setIsDeleting(true);
+        }, pause);
+      } else {
+        timer = setTimeout(() => {
+          setDisplayedText(currentText.substring(0, displayedText.length + 1));
+        }, speed);
+      }
+    }
+    return () => clearTimeout(timer);
+  }, [displayedText, isDeleting, textIndex, texts, speed, pause]);
+
+  return <span className="typewriter-text">{displayedText}<span className="cursor">|</span></span>;
+}
+
 export default function App() {
   // Auth state
   const [authUser, setAuthUser] = useState(getStoredUser);
@@ -466,11 +715,11 @@ export default function App() {
       <header className="navbar">
         <div className="brand">
           <div className="brand-icon">
-            <Sparkles size={20} color="#003824" strokeWidth={2.5} />
+            <Sparkles size={18} color="white" strokeWidth={2.5} />
           </div>
           <div className="brand-title">
             <h1>Jan Vaani</h1>
-            <p>Voice AI for Welfare Schemes · StarForge 2026</p>
+            <p>JAN VAANI · AI SCHEME FINDER</p>
           </div>
         </div>
 
@@ -515,86 +764,149 @@ export default function App() {
       <div className="main-grid">
 
         {/* ── Left: Voice + Transcript ── */}
-        <div className="workspace">
+        <div className="workspace glass-panel unified-workspace">
 
-          {/* Voice Hero */}
-          <div className="glass-panel voice-hero">
-
-            {/* Status chip */}
-            <div className={`status-chip ${status}`}>
-              <div className="status-dot" />
-              <span>{statusLabel}</span>
-            </div>
-
-            {/* Mic button + rings */}
-            <div className="mic-button-wrapper">
-
-              {/* Idle breathing rings */}
-              {status === 'idle' && (
-                <>
-                  <div className="mic-ring-idle" />
-                  <div className="mic-ring-idle" />
-                  <div className="mic-ring-idle" />
-                </>
-              )}
-
-              {/* Recording ripple rings */}
-              {status === 'listening' && (
-                <>
-                  <div className="mic-ripple" />
-                  <div className="mic-ripple" />
-                  <div className="mic-ripple" />
-                </>
-              )}
-
-              {/* Processing spinner ring */}
-              {status === 'processing' && <div className="mic-spinner-ring" />}
-
-              {/* Speaking waveform */}
-              {status === 'speaking' && <Waveform />}
-
-              {/* The mic button itself (hidden behind waveform when speaking) */}
-              {status !== 'speaking' && (
-                <button
-                  id="mic-btn"
-                  className={`mic-btn ${recording ? 'active' : ''} ${status === 'processing' ? 'processing' : ''}`}
-                  onMouseDown={status === 'idle' ? startRecording : undefined}
-                  onMouseUp={status === 'listening' ? stopRecording : undefined}
-                  onTouchStart={(e) => { if (status === 'idle') { e.preventDefault(); startRecording(); } }}
-                  onTouchEnd={(e) => { if (status === 'listening') { e.preventDefault(); stopRecording(); } }}
-                  disabled={status === 'processing'}
-                >
-                  {recording ? <Square size={32} /> : <Mic size={40} />}
-                </button>
-              )}
-            </div>
-
-            <p className="mic-hint">
-              {language === 'hi' ? 'दबाकर रखें → बोलें → छोड़ें' : 'Hold → Speak → Release'}
+          {/* Header */}
+          <div className="unified-header">
+            <h2>{language === 'hi' ? 'वॉयस असिस्टेंट' : 'Voice Assistant'}</h2>
+            <p style={{ minHeight: '42px' }}>
+              <TypewriterText 
+                texts={
+                  language === 'hi'
+                    ? [
+                        'माइक पर टैप करें और उन योजनाओं को खोजने के लिए बोलना शुरू करें जिनके आप पात्र हैं।',
+                        'माइक बटन को दबाए रखें, अपना प्रश्न बोलें, और छोड़ दें।',
+                        'हिंदी या अंग्रेजी में सरकारी योजनाओं के बारे में पूछें।',
+                        'पता करें कि कौन से कल्याणकारी कार्यक्रम आपकी प्रोफ़ाइल से मेल खाते हैं।'
+                      ]
+                    : [
+                        'Tap the microphone and start speaking to find schemes you qualify for.',
+                        'Hold the microphone button, speak your query, and release.',
+                        'Ask about government schemes in Hindi or English.',
+                        'Find out which welfare programs match your profile.'
+                      ]
+                }
+                speed={40}
+                pause={3000}
+              />
             </p>
+          </div>
 
-            <button id="interrupt-btn" className="interrupt-btn" onClick={handleInterrupt}>
-              <PhoneOff size={13} />
-              <span>{language === 'hi' ? 'रोकें' : 'Interrupt'}</span>
-            </button>
+          {/* Voice Hero — Rural Scene with animated characters + Mic */}
+          <div className="voice-hero unified-mic-section">
+            <div className="rural-scene">
+
+              {/* Rural Characters arranged around mic */}
+              <RuralFarmer />
+              <RuralWomanWater />
+              <RuralPlanter />
+              <RuralHarvestWoman />
+
+              {/* Mic in the center */}
+              <div className="mic-center-area">
+                <div className="mic-button-wrapper">
+                  {status === 'idle' && (
+                    <>
+                      <div className="mic-ring-idle" />
+                      <div className="mic-ring-idle" />
+                      <div className="mic-ring-idle" />
+                    </>
+                  )}
+                  {status === 'listening' && (
+                    <>
+                      <div className="mic-ripple" />
+                      <div className="mic-ripple" />
+                      <div className="mic-ripple" />
+                    </>
+                  )}
+                  {status === 'processing' && <div className="mic-spinner-ring" />}
+                  {status === 'speaking' && <Waveform />}
+                  {status !== 'speaking' && (
+                    <button
+                      id="mic-btn"
+                      className={`mic-btn ${recording ? 'active' : ''} ${status === 'processing' ? 'processing' : ''}`}
+                      onMouseDown={status === 'idle' ? startRecording : undefined}
+                      onMouseUp={status === 'listening' ? stopRecording : undefined}
+                      onTouchStart={(e) => { if (status === 'idle') { e.preventDefault(); startRecording(); } }}
+                      onTouchEnd={(e) => { if (status === 'listening') { e.preventDefault(); stopRecording(); } }}
+                      disabled={status === 'processing'}
+                    >
+                      {recording ? <Square size={28} /> : <Mic size={36} />}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Mic label row */}
+            <div style={{ textAlign: 'center', marginTop: '8px' }}>
+              {status === 'idle' ? (
+                <>
+                  <p className="mic-hint">
+                    {language === 'hi' ? 'बोलने के लिए लाल बटन को छुएं' : 'Hold the red button to speak'}
+                  </p>
+                  <p className="mic-sub-hint">
+                    <TypewriterText
+                      texts={
+                        language === 'hi'
+                          ? [
+                              '"मुझे खेती-बाड़ी और किसान सम्मान निधि योजना के बारे में बताएं"',
+                              '"मेरी उम्र 45 साल है और मैं हरियाणा में रहता हूं"',
+                              '"मुझे वृद्धा पेंशन योजना के बारे में जानना है"'
+                            ]
+                          : [
+                              '"Tell me about Kisan Samman Nidhi scheme"',
+                              '"I am 45 years old and live in Haryana"',
+                              '"What schemes am I eligible for?"'
+                            ]
+                      }
+                      speed={40}
+                      pause={3000}
+                    />
+                  </p>
+                </>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                  {status !== 'idle' && (
+                    <button id="interrupt-btn" className="interrupt-btn" onClick={handleInterrupt}>
+                      <PhoneOff size={13} />
+                      <span>{language === 'hi' ? 'रोकें' : 'Interrupt'}</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Transcript Panel */}
-          <div className="glass-panel transcript-panel">
-            <h3 className="panel-title">
-              <Activity size={15} className="text-teal" />
-              {language === 'hi' ? 'बातचीत' : 'Conversation'}
-            </h3>
+          <div className="transcript-panel unified-transcript-box">
+            {/* Header row */}
+            <div className="transcript-panel-header">
+              <div className="transcript-panel-title">
+                <div className="dot" />
+                {language === 'hi' ? 'बातचीत' : 'Conversations'}
+              </div>
+              <button
+                className="transcript-history-link"
+                onClick={showHistory ? closeHistory : openHistory}
+              >
+                HISTORY
+              </button>
+            </div>
+
             <div className="transcript-box">
               {turns.length === 0 ? (
                 <div className="transcript-empty">
                   <div className="transcript-empty-icon">
-                    <Mic size={22} />
+                    <MessageSquare size={22} />
                   </div>
-                  <p>
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--text-dark)' }}>
+                    {language === 'hi' ? 'अभी तक कोई बातचीत नहीं हुई' : 'No conversations yet'}
+                  </h3>
+                  <p style={{ marginTop: '6px', color: 'var(--text-muted)', fontSize: '0.83rem', lineHeight: 1.6 }}>
                     {language === 'hi'
-                      ? 'माइक दबाएं और सरकारी योजनाओं के बारे में पूछें!'
-                      : 'Hold the mic and ask about welfare schemes or check eligibility!'}
+                      ? 'चिंता न करें। उनार दिए गए बड़े लाल बटन को दबाकर पूछें: "मुझे बुढ़्फ़ा पेंशन योजना के बारे में जानना है"'
+                      : 'Hold the red button above and ask: "Tell me about old age pension scheme"'}
                   </p>
                 </div>
               ) : (
@@ -613,6 +925,13 @@ export default function App() {
               )}
               <div ref={transcriptEndRef} />
             </div>
+
+            {status !== 'idle' && (
+              <div className={`status-indicator ${status}`}>
+                <Activity size={14} className="status-indicator-icon" />
+                <span>{statusLabel}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -666,6 +985,13 @@ export default function App() {
                 </div>
               </div>
             )}
+
+            {/* Privacy note */}
+            <p className="privacy-note">
+              * {language === 'hi'
+                ? 'आपकी जानकारी पूरी तरह से सुरक्षित है और इसका उपयोग केवल कल्याणकारी योजनाओं की खोज के लिए किया जाएगा।'
+                : 'Your information is fully secure and will only be used to find welfare schemes.'}
+            </p>
 
             {/* ── Divider if both user info and extracted slots exist ── */}
             {userInfo && Object.keys(profile).length > 0 && (
@@ -737,26 +1063,26 @@ export default function App() {
             </div>
           )}
 
-          {/* Session Info + End Chat */}
+          {/* Session Info + Session Controls */}
           {sessionId && (
-            <div className="glass-panel session-info-card">
-              <p className="session-label">Session ID</p>
-              <p className="session-id">{sessionId.slice(0, 18)}…</p>
+            <div className="glass-panel">
+              <div className="session-id-box">
+                <div className="session-id-label">SESSION ID</div>
+                <div className="session-id-value">{sessionId}</div>
+              </div>
+
               <button
                 id="new-session-btn"
                 className="new-session-btn"
                 onClick={() => initSession(language)}
               >
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <ChevronRight size={14} />
-                  {language === 'hi' ? 'नया सत्र शुरू करें' : 'Start New Session'}
-                </span>
+                <ChevronRight size={14} />
+                {language === 'hi' ? 'नया सत्र शुरू करें' : 'Start New Session'}
               </button>
 
-              {/* End Chat Button */}
               <button
                 id="end-chat-btn"
-                className="end-chat-btn"
+                className="end-session-btn"
                 onClick={handleEndChat}
                 disabled={endingChat || turns.length === 0}
                 title={turns.length === 0 ? 'No conversation to save' : 'End this chat and save it'}
@@ -764,7 +1090,7 @@ export default function App() {
                 <StopCircle size={14} />
                 {endingChat
                   ? (language === 'hi' ? 'सहेजा जा रहा है…' : 'Saving…')
-                  : (language === 'hi' ? 'चैट समाप्त करें और सहेजें' : 'End Chat & Save')
+                  : (language === 'hi' ? 'चैट समाप्त करें' : 'End Chat')
                 }
               </button>
             </div>
@@ -787,7 +1113,7 @@ export default function App() {
                 <Headphones size={24} color="var(--saffron)" />
               </div>
               <div>
-                <h2 style={{ fontSize: '1.15rem', color: 'var(--text-white)', fontWeight: 800 }}>
+                <h2 style={{ fontSize: '1.15rem', color: 'var(--text-dark)', fontWeight: 800 }}>
                   Human Handoff Triggered
                 </h2>
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 3 }}>

@@ -3,12 +3,11 @@ import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Mic } from 
 
 const API_BASE = 'http://localhost:8000';
 
-// Subtle typewriter for tagline
 const TAGLINES = [
-  'Welfare schemes in your voice.',
-  'Speak. We understand Hindi.',
-  'Powered by Gemini & Rime Coda.',
-  'Gramin Scheme Navigator AI.',
+  'सरकारी योजनाएँ, आपकी आवाज़ में।',
+  'हिंदी में बोलें — हम समझते हैं।',
+  'किसान, महिला, बुजुर्ग — सबके लिए।',
+  'Gramin AI Scheme Navigator.',
 ];
 
 export default function Login({ onAuthSuccess, onGoRegister }) {
@@ -74,27 +73,40 @@ export default function Login({ onAuthSuccess, onGoRegister }) {
 
   return (
     <div className="auth-page">
-      {/* Animated ambient orbs */}
-      <div className="auth-orb auth-orb-teal" />
-      <div className="auth-orb auth-orb-saffron" />
-      <div className="auth-orb auth-orb-indigo" />
+      {/* Decorative rural SVG background elements */}
+      <svg style={{ position: 'absolute', bottom: 0, left: 0, opacity: 0.08, pointerEvents: 'none' }}
+        width="280" height="200" viewBox="0 0 280 200" fill="none">
+        <ellipse cx="80" cy="180" rx="80" ry="40" fill="#2D6A4F"/>
+        <rect x="76" y="130" width="8" height="50" fill="#A0663A"/>
+        <ellipse cx="80" cy="122" rx="22" ry="28" fill="#2D6A4F"/>
+        <rect x="200" y="145" width="6" height="35" fill="#A0663A"/>
+        <ellipse cx="203" cy="138" rx="16" ry="20" fill="#52B788"/>
+        <circle cx="240" cy="30" r="22" fill="#F5A623"/>
+      </svg>
+
+      <svg style={{ position: 'absolute', top: 0, right: 0, opacity: 0.08, pointerEvents: 'none', transform: 'scaleX(-1)' }}
+        width="220" height="180" viewBox="0 0 280 200" fill="none">
+        <ellipse cx="80" cy="180" rx="80" ry="40" fill="#D4720C"/>
+        <rect x="76" y="130" width="8" height="50" fill="#A0663A"/>
+        <ellipse cx="80" cy="122" rx="22" ry="28" fill="#C1440E"/>
+      </svg>
 
       <div className="auth-card">
         {/* Brand */}
         <div className="auth-brand">
           <div className="auth-brand-icon">
-            <Sparkles size={26} color="#003824" strokeWidth={2.5} />
+            <Sparkles size={24} color="white" strokeWidth={2.5} />
           </div>
           <div>
             <h1 className="auth-brand-name">Jan Vaani</h1>
             <p className="auth-brand-sub" style={{ minHeight: '1.1rem' }}>
               {taglineText}
-              {typing && <span style={{ opacity: 0.6, animation: 'dot-pulse 0.8s infinite' }}>|</span>}
+              {typing && <span style={{ opacity: 0.7, color: 'var(--saffron)' }}>|</span>}
             </p>
           </div>
         </div>
 
-        <h2 className="auth-title">Welcome back</h2>
+        <h2 className="auth-title">नमस्ते! 🙏</h2>
         <p className="auth-subtitle">Sign in to access your welfare scheme assistant</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -167,12 +179,12 @@ export default function Login({ onAuthSuccess, onGoRegister }) {
         </p>
 
         <div className="auth-divider">
-          <span>Hackathon Demo</span>
+          <span>StarForge Hackathon 2026</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <Mic size={11} style={{ color: 'rgba(78,222,163,0.4)' }} />
-          <p className="auth-demo-note">Jan Vaani · StarForge Hackathon 2026 · Voice-first welfare AI</p>
+          <Mic size={11} style={{ color: 'rgba(212,114,12,0.5)' }} />
+          <p className="auth-demo-note">Jan Vaani · Voice-first Welfare AI for Rural India</p>
         </div>
       </div>
     </div>

@@ -40,21 +40,34 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
 
   // Password strength
   const pwdStrength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
-  const strengthColors = ['', '#ff5a5a', '#ffb95f', 'var(--teal)'];
+  const strengthColors = ['', '#C1440E', '#E8803A', '#2D6A4F'];
   const strengthLabels = ['', 'Weak', 'Fair', 'Strong'];
 
   return (
     <div className="auth-page">
-      {/* Animated ambient orbs */}
-      <div className="auth-orb auth-orb-teal" />
-      <div className="auth-orb auth-orb-saffron" />
-      <div className="auth-orb auth-orb-indigo" />
+      {/* Decorative rural SVG elements */}
+      <svg style={{ position: 'absolute', bottom: 0, left: 0, opacity: 0.07, pointerEvents: 'none' }}
+        width="280" height="200" viewBox="0 0 280 200" fill="none">
+        <ellipse cx="80" cy="180" rx="80" ry="40" fill="#2D6A4F"/>
+        <rect x="76" y="130" width="8" height="50" fill="#A0663A"/>
+        <ellipse cx="80" cy="122" rx="22" ry="28" fill="#2D6A4F"/>
+        <rect x="200" y="145" width="6" height="35" fill="#A0663A"/>
+        <ellipse cx="203" cy="138" rx="16" ry="20" fill="#52B788"/>
+        <circle cx="240" cy="30" r="22" fill="#F5A623"/>
+      </svg>
+
+      <svg style={{ position: 'absolute', top: 0, right: 0, opacity: 0.07, pointerEvents: 'none', transform: 'scaleX(-1)' }}
+        width="220" height="180" viewBox="0 0 280 200" fill="none">
+        <ellipse cx="80" cy="180" rx="80" ry="40" fill="#D4720C"/>
+        <rect x="76" y="130" width="8" height="50" fill="#A0663A"/>
+        <ellipse cx="80" cy="122" rx="22" ry="28" fill="#C1440E"/>
+      </svg>
 
       <div className="auth-card">
         {/* Brand */}
         <div className="auth-brand">
           <div className="auth-brand-icon">
-            <Sparkles size={26} color="#003824" strokeWidth={2.5} />
+            <Sparkles size={24} color="white" strokeWidth={2.5} />
           </div>
           <div>
             <h1 className="auth-brand-name">Jan Vaani</h1>
@@ -62,7 +75,7 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
           </div>
         </div>
 
-        <h2 className="auth-title">Create your account</h2>
+        <h2 className="auth-title">अकाउंट बनाएं</h2>
         <p className="auth-subtitle">Start checking welfare scheme eligibility for free</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -136,10 +149,12 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
             </div>
             {password.length > 0 && (
               <div className="pwd-strength-bar">
-                <div
-                  className="pwd-strength-fill"
-                  style={{ width: `${(pwdStrength / 3) * 100}%`, background: strengthColors[pwdStrength] }}
-                />
+                <div className="pwd-strength-track">
+                  <div
+                    className="pwd-strength-fill"
+                    style={{ width: `${(pwdStrength / 3) * 100}%`, background: strengthColors[pwdStrength] }}
+                  />
+                </div>
                 <span style={{ color: strengthColors[pwdStrength], fontSize: '0.74rem', marginTop: '4px' }}>
                   {strengthLabels[pwdStrength]}
                 </span>
@@ -164,8 +179,8 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
               {confirmPassword.length > 0 && (
                 <span className="auth-match-indicator">
                   {password === confirmPassword
-                    ? <CheckCircle2 size={15} color="var(--teal)" />
-                    : <AlertCircle size={15} color="var(--crimson)" />}
+                    ? <CheckCircle2 size={15} color="var(--green-mid)" />
+                    : <AlertCircle size={15} color="var(--terracotta)" />}
                 </span>
               )}
             </div>
@@ -189,12 +204,12 @@ export default function Register({ onAuthSuccess, onGoLogin }) {
         </p>
 
         <div className="auth-divider">
-          <span>Hackathon Demo</span>
+          <span>StarForge Hackathon 2026</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <Mic size={11} style={{ color: 'rgba(78,222,163,0.4)' }} />
-          <p className="auth-demo-note">Jan Vaani · StarForge Hackathon 2026 · Voice-first welfare AI</p>
+          <Mic size={11} style={{ color: 'rgba(212,114,12,0.5)' }} />
+          <p className="auth-demo-note">Jan Vaani · Voice-first Welfare AI for Rural India</p>
         </div>
       </div>
     </div>
