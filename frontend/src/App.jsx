@@ -77,6 +77,7 @@ export default function App() {
   const [status, setStatus] = useState('idle'); // idle | listening | processing | speaking
   const [turns, setTurns] = useState([]);
   const [profile, setProfile] = useState({});
+  const [userInfo, setUserInfo] = useState(null);
   const [latestEligibility, setLatestEligibility] = useState(null);
   const [crossMatches, setCrossMatches] = useState([]);
   const [handoffData, setHandoffData] = useState(null);
@@ -97,21 +98,40 @@ export default function App() {
   const transcriptEndRef = useRef(null);
 
   useEffect(() => {
-    if (authUser) initSession(language);
+    if (authUser) {
+      initSession(language);
+      fetchUserProfile();
+    }
   }, [language, authUser?.user_id]);
 
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [turns]);
 
+  // ── Fetch user profile from /auth/me ─────────────────────
+  const fetchUserProfile = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/me`, { headers: authHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        setUserInfo(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch user profile:', err);
+    }
+  };
+
   const handleAuthSuccess = (data) => {
     setAuthUser({ user_id: data.user_id, email: data.email, full_name: data.full_name });
+    // Fetch full user profile after login/register
+    setTimeout(fetchUserProfile, 100);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('jv_token');
     localStorage.removeItem('jv_user');
     setAuthUser(null);
+    setUserInfo(null);
     setSessionId(null);
     setTurns([]);
     setProfile({});
@@ -539,6 +559,53 @@ export default function App() {
                 {language === 'hi' ? 'आपकी जानकारी' : 'Extracted Profile'}
               </span>
             </h3>
+
+            {/* ── User credentials card ── */}
+            {userInfo && (
+              <div className="user-info-card">
+                <div className="user-info-avatar">
+                  {(userInfo.full_name || userInfo.email).charAt(0).toUpperCase()}
+                </div>
+                <div className="user-info-details">
+                  {userInfo.full_name && (
+                    <div className="user-info-row">
+                      <span className="user-info-icon">✦</span>
+                      <div>
+                        <div className="user-info-label">{language === 'hi' ? 'नाम' : 'Name'}</div>
+                        <div className="user-info-value">{userInfo.full_name}</div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="user-info-row">
+                    <span className="user-info-icon">✉</span>
+                    <div>
+                      <div className="user-info-label">{language === 'hi' ? 'ईमेल' : 'Email'}</div>
+                      <div className="user-info-value">{userInfo.email}</div>
+                    </div>
+                  </div>
+                  {userInfo.created_at && (
+                    <div className="user-info-row">
+                      <span className="user-info-icon">🗓</span>
+                      <div>
+                        <div className="user-info-label">{language === 'hi' ? 'सदस्य बने' : 'Member since'}</div>
+                        <div className="user-info-value">
+                          {new Date(userInfo.created_at.endsWith('Z') ? userInfo.created_at : userInfo.created_at + 'Z')
+                            .toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── Divider if both user info and extracted slots exist ── */}
+            {userInfo && Object.keys(profile).length > 0 && (
+              <div className="profile-divider">
+                <span>{language === 'hi' ? 'एकत्रित तथ्य' : 'Collected Facts'}</span>
+              </div>
+            )}
+
             <div className="slot-list">
               {Object.keys(profile).length === 0 ? (
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.83rem', textAlign: 'center', padding: '14px 0', lineHeight: 1.6 }}>
