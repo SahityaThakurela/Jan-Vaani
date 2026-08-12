@@ -1193,13 +1193,16 @@ body {
 
 .history-drawer-close:hover { background: var(--cream-darker); color: var(--text-dark); }
 
-.history-drawer-body {
+.history-list {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 16px 24px;
 }
 
-.history-session-item {
+.history-session-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   background: var(--cream);
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
@@ -1209,50 +1212,79 @@ body {
   transition: all 0.2s ease;
 }
 
-.history-session-item:hover {
+.history-session-card:hover {
   border-color: rgba(212,114,12,0.4);
   box-shadow: var(--shadow-sm);
   transform: translateX(2px);
 }
 
-.history-session-item.active {
+.history-session-card.current {
   border-color: var(--saffron);
   background: var(--saffron-pale);
 }
 
-.history-session-id {
-  font-size: 0.72rem;
-  font-family: monospace;
-  color: var(--text-muted);
-  margin-bottom: 5px;
+.history-session-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--saffron-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.history-session-icon.completed {
+  background: var(--cream-dark);
+}
+
+.history-session-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.history-session-date {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .history-session-meta {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
 }
 
-.history-session-status {
+.history-session-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: var(--r-full);
-  font-size: 0.71rem;
   font-weight: 600;
+  text-transform: capitalize;
 }
 
-.history-session-status.active {
+.history-session-badge.active {
   background: rgba(45,106,79,0.12);
   color: var(--green-mid);
 }
 
-.history-session-status.completed {
+.history-session-badge.completed {
   background: var(--cream-dark);
   color: var(--text-muted);
+}
+
+.history-session-turns {
+  display: inline-flex;
+  align-items: center;
 }
 
 .history-empty {

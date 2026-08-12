@@ -1117,10 +1117,10 @@ export default function App() {
       {showLogoutConfirm && (
         <div className="handoff-overlay" onClick={() => setShowLogoutConfirm(false)}>
           <div className="handoff-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '1.2rem', color: 'var(--text-white)', fontWeight: 800, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.2rem', color: 'var(--text-dark)', fontWeight: 800, marginBottom: '8px' }}>
               {language === 'hi' ? 'लॉगआउट करें?' : 'Logout?'}
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
               {language === 'hi' ? 'क्या आप वाकई लॉगआउट करना चाहते हैं?' : 'Are you sure you want to logout?'}
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
@@ -1357,10 +1357,10 @@ export default function App() {
         <div className="handoff-overlay" onClick={() => setShowEndConfirm(false)}>
           <div className="handoff-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center' }}>
             <div style={{ marginBottom: 16, fontSize: '2rem' }}>⚠️</div>
-            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-white)', fontWeight: 800, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-dark)', fontWeight: 800, marginBottom: '8px' }}>
               {language === 'hi' ? 'सत्र समाप्त करें?' : 'End Session?'}
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '24px', lineHeight: 1.6 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '24px', lineHeight: 1.6 }}>
               {language === 'hi'
                 ? 'क्या आप इस चैट सत्र को पूर्ण के रूप में चिह्नित करना चाहते हैं?'
                 : 'Are you sure you want to mark this chat session as completed? This will close it permanently.'}
