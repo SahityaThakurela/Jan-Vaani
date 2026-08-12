@@ -215,6 +215,31 @@ async def compose_reply(
         logger.error(f"Reply composition failed: {e}")
         return "Kuch gadbad ho gayi. Dobara poochhen."
 
+async def generate_session_title(user_query: str, language: str = "hi") -> str:
+    """Generates a concise 3-5 word title for the session based on the first query."""
+    if not OPENROUTER_API_KEY:
+        return "New Chat"
+
+    prompt = (
+        f"You are a helpful assistant. The user just started a conversation with the following query:\n"
+        f"\"{user_query}\"\n\n"
+        f"Generate a very concise, meaningful title for this session (3 to 5 words max). "
+        f"Do not use quotes. Use the same language the user used ({language})."
+    )
+
+    try:
+        client = _get_client()
+        response = await client.chat.completions.create(
+            model=OPENROUTER_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=20,
+        )
+        return response.choices[0].message.content.strip().strip('"')
+    except Exception as e:
+        logger.error(f"Title generation failed: {e}")
+        return "New Chat"
+
 async def resolve_scheme_name(
     spoken_name: str,
     available_schemes: List[Dict[str, str]],

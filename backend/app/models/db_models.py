@@ -119,6 +119,7 @@ class Session(Base):
     __tablename__ = "sessions"
 
     session_id: Mapped[str] = mapped_column(String(64), primary_key=True, default=_uuid)
+    title: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     user_id: Mapped[Optional[str]] = mapped_column(
         String(64), ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True
     )

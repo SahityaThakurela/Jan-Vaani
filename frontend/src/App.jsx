@@ -1140,6 +1140,9 @@ export default function App() {
                       {s.status === 'completed' ? '✅' : '💬'}
                     </div>
                     <div className="history-session-info">
+                      <div className="history-session-title">
+                        {s.title || (language === 'hi' ? 'नई चैट' : 'New Chat')}
+                      </div>
                       <div className="history-session-date">
                         {s.session_id === sessionId
                           ? `⚡ ${language === 'hi' ? 'वर्तमान सत्र' : 'Current Session'}`
@@ -1177,7 +1180,7 @@ export default function App() {
                 <div className="transcript-modal-title">
                   {viewingSession.loading
                     ? (language === 'hi' ? 'लोड हो रहा है…' : 'Loading…')
-                    : `${language === 'hi' ? 'चैट' : 'Chat'} — ${viewingSession.session?.session_id?.slice(0, 16)}…`
+                    : (viewingSession.session?.title || (language === 'hi' ? 'नई चैट' : 'New Chat'))
                   }
                 </div>
                 {!viewingSession.loading && viewingSession.session && (
