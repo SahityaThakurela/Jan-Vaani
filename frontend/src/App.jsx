@@ -3,7 +3,7 @@ import {
   Mic, Square, PhoneOff, Sparkles,
   CheckCircle2, AlertTriangle, Headphones, LogOut, User,
   Zap, Activity, Radio, ChevronRight, StopCircle, History, X,
-  MessageSquare, Clock
+  MessageSquare, Clock, Menu, Calendar
 } from 'lucide-react';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -318,6 +318,7 @@ export default function App() {
   // Auth state
   const [authUser, setAuthUser] = useState(getStoredUser);
   const [authView, setAuthView] = useState('login');
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // App state
   const [language, setLanguage] = useState('hi');
@@ -748,14 +749,41 @@ export default function App() {
             <span>{language === 'hi' ? 'पिछली चैट' : 'Previous Chats'}</span>
           </button>
 
-          <div className="user-pill">
-            <User size={13} />
-            <span className="user-pill-name">
-              {authUser.full_name || authUser.email.split('@')[0]}
-            </span>
-            <button id="logout-btn" className="logout-btn" onClick={() => setShowLogoutConfirm(true)} title="Sign out">
-              <LogOut size={13} />
+          <div className="user-menu-wrapper">
+            <button
+              className={`hamburger-btn ${showUserMenu ? 'active' : ''}`}
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              title="User menu"
+            >
+              <Menu size={20} />
             </button>
+            
+            {showUserMenu && authUser && (
+              <div className="user-dropdown">
+                <div className="user-dropdown-header">
+                  <div className="user-dropdown-avatar">
+                    {(userInfo?.full_name || authUser.email).charAt(0).toUpperCase()}
+                  </div>
+                  <div className="user-dropdown-info">
+                    {userInfo?.full_name && <div className="user-dropdown-name">{userInfo.full_name}</div>}
+                    <div className="user-dropdown-email">{authUser.email}</div>
+                  </div>
+                </div>
+                {userInfo?.created_at && (
+                  <div className="user-dropdown-meta">
+                    <Calendar size={13} className="user-dropdown-meta-icon" />
+                    Member since {new Date(userInfo.created_at.endsWith('Z') ? userInfo.created_at : userInfo.created_at + 'Z').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </div>
+                )}
+                <button className="logout-btn" onClick={() => {
+                  setShowUserMenu(false);
+                  setShowLogoutConfirm(true);
+                }}>
+                  <LogOut size={14} />
+                  Sign Out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -947,58 +975,12 @@ export default function App() {
               </span>
             </h3>
 
-            {/* ── User credentials card ── */}
-            {userInfo && (
-              <div className="user-info-card">
-                <div className="user-info-avatar">
-                  {(userInfo.full_name || userInfo.email).charAt(0).toUpperCase()}
-                </div>
-                <div className="user-info-details">
-                  {userInfo.full_name && (
-                    <div className="user-info-row">
-                      <span className="user-info-icon">✦</span>
-                      <div>
-                        <div className="user-info-label">{language === 'hi' ? 'नाम' : 'Name'}</div>
-                        <div className="user-info-value">{userInfo.full_name}</div>
-                      </div>
-                    </div>
-                  )}
-                  <div className="user-info-row">
-                    <span className="user-info-icon">✉</span>
-                    <div>
-                      <div className="user-info-label">{language === 'hi' ? 'ईमेल' : 'Email'}</div>
-                      <div className="user-info-value">{userInfo.email}</div>
-                    </div>
-                  </div>
-                  {userInfo.created_at && (
-                    <div className="user-info-row">
-                      <span className="user-info-icon">🗓</span>
-                      <div>
-                        <div className="user-info-label">{language === 'hi' ? 'सदस्य बने' : 'Member since'}</div>
-                        <div className="user-info-value">
-                          {new Date(userInfo.created_at.endsWith('Z') ? userInfo.created_at : userInfo.created_at + 'Z')
-                            .toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* Privacy note */}
-            <p className="privacy-note">
+            <p className="privacy-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', marginBottom: '12px' }}>
               * {language === 'hi'
                 ? 'आपकी जानकारी पूरी तरह से सुरक्षित है और इसका उपयोग केवल कल्याणकारी योजनाओं की खोज के लिए किया जाएगा।'
                 : 'Your information is fully secure and will only be used to find welfare schemes.'}
             </p>
-
-            {/* ── Divider if both user info and extracted slots exist ── */}
-            {userInfo && Object.keys(profile).length > 0 && (
-              <div className="profile-divider">
-                <span>{language === 'hi' ? 'एकत्रित तथ्य' : 'Collected Facts'}</span>
-              </div>
-            )}
 
             <div className="slot-list">
               {Object.keys(profile).length === 0 ? (
