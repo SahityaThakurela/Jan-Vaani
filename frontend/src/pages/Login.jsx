@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Mic } from 'lucide-react';
+import RuralBackground from '../components/RuralBackground';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -72,24 +73,8 @@ export default function Login({ onAuthSuccess, onGoRegister }) {
   };
 
   return (
-    <div className="auth-page">
-      {/* Decorative rural SVG background elements */}
-      <svg style={{ position: 'absolute', bottom: 0, left: 0, opacity: 0.08, pointerEvents: 'none' }}
-        width="280" height="200" viewBox="0 0 280 200" fill="none">
-        <ellipse cx="80" cy="180" rx="80" ry="40" fill="#2D6A4F"/>
-        <rect x="76" y="130" width="8" height="50" fill="#A0663A"/>
-        <ellipse cx="80" cy="122" rx="22" ry="28" fill="#2D6A4F"/>
-        <rect x="200" y="145" width="6" height="35" fill="#A0663A"/>
-        <ellipse cx="203" cy="138" rx="16" ry="20" fill="#52B788"/>
-        <circle cx="240" cy="30" r="22" fill="#F5A623"/>
-      </svg>
-
-      <svg style={{ position: 'absolute', top: 0, right: 0, opacity: 0.08, pointerEvents: 'none', transform: 'scaleX(-1)' }}
-        width="220" height="180" viewBox="0 0 280 200" fill="none">
-        <ellipse cx="80" cy="180" rx="80" ry="40" fill="#D4720C"/>
-        <rect x="76" y="130" width="8" height="50" fill="#A0663A"/>
-        <ellipse cx="80" cy="122" rx="22" ry="28" fill="#C1440E"/>
-      </svg>
+    <div className="auth-page" style={{ position: 'relative' }}>
+      <RuralBackground />
 
       <div className="auth-card">
         {/* Brand */}
