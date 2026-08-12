@@ -102,17 +102,21 @@ async def voice_turn(
     cross_matches: List[CrossSchemeMatch] = []
     handoff_triggered = False
 
-    # Get conversation history for context
+    # Get conversation history for context — fetch BOTH user & agent turns in order
     turns_result = await db.execute(
         select(ConversationTurn)
         .where(ConversationTurn.session_id == session_id)
-        .order_by(ConversationTurn.turn_number.desc())
-        .limit(5)
+        .order_by(ConversationTurn.turn_number.asc())
+        .limit(10)   # last 10 DB rows = up to 5 full exchanges
     )
-    recent_turns = [
-        {"role": "user", "text": t.user_text or ""}
-        for t in turns_result.scalars().all()
-    ]
+    raw_turns = turns_result.scalars().all()
+    # Build alternating user/agent history list (preserves full conversation memory)
+    recent_turns = []
+    for t in raw_turns:
+        if t.user_text:
+            recent_turns.append({"role": "user", "text": t.user_text})
+        if t.agent_text:
+            recent_turns.append({"role": "agent", "text": t.agent_text})
 
     try:
         # ── 2a. Intent Classification ──────────────────────────────
@@ -132,6 +136,7 @@ async def voice_turn(
                     "correction_ack",
                     {"field": correction_field, "value": correction_value},
                     language,
+                    conversation_history=recent_turns,
                 )
                 action_taken = f"CORRECTION:{correction_field}"
             else:
@@ -144,6 +149,7 @@ async def voice_turn(
                     "correction_ack",
                     {"extracted": extracted},
                     language,
+                    conversation_history=recent_turns,
                 )
 
         # Handle handoff intent
@@ -174,6 +180,7 @@ async def voice_turn(
                 "search_result",
                 {"query": user_text, "results": summaries},
                 language,
+                conversation_history=recent_turns,
             )
 
         # Scheme detail
@@ -198,6 +205,7 @@ async def voice_turn(
                     "scheme_detail",
                     {"scheme_id": resolved_id, "chunks": context_texts[:2]},
                     language,
+                    conversation_history=recent_turns,
                 )
                 action_taken = f"SCHEME_DETAIL:{resolved_id}"
             else:
@@ -205,6 +213,7 @@ async def voice_turn(
                     "error",
                     {"message": "scheme not found", "hint": scheme_hint},
                     language,
+                    conversation_history=recent_turns,
                 )
                 action_taken = "SCHEME_NOT_FOUND"
 
@@ -263,6 +272,7 @@ async def voice_turn(
                     "note": "Answer the user's question directly and helpfully based on the context provided.",
                 },
                 language,
+                conversation_history=recent_turns,
             )
 
         else:
@@ -271,6 +281,7 @@ async def voice_turn(
                 "clarify",
                 {"message": user_text, "hint": "Respond helpfully to the user's query about government schemes."},
                 language,
+                conversation_history=recent_turns,
             )
             action_taken = "UNCLEAR"
 

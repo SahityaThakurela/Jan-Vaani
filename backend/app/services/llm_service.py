@@ -152,6 +152,7 @@ async def compose_reply(
     situation: str,
     context: Dict[str, Any],
     language: str = "hi",
+    conversation_history: Optional[List[Dict[str, str]]] = None,
 ) -> str:
     
     if not OPENROUTER_API_KEY:
@@ -161,34 +162,53 @@ async def compose_reply(
         }
         return fallbacks.get(situation, context.get("question", "Haan, boliye."))
 
+    lang_name = "Hindi" if language == "hi" else "English"
     system = (
-        "You are Jan Vaani, a warm and helpful voice assistant for rural Indian users. "
-        "Always respond concisely (1-3 sentences). Use simple, spoken language. "
-        "No bullet points, no markdown, no long paragraphs — this is spoken audio. "
-        f"Respond in {'Hindi' if language == 'hi' else 'English'}."
+        "You are Jan Vaani, a knowledgeable and warm voice assistant helping rural Indian citizens "
+        "navigate government welfare schemes (Yojanas). You have deep knowledge of Indian government "
+        "schemes like PM-KISAN, Pradhan Mantri Awas Yojana (PMAY-G), Ayushman Bharat, MGNREGA, "
+        "PM Fasal Bima Yojana, PM Ujjwala Yojana, and similar programs.\n\n"
+        "RESPONSE RULES:\n"
+        "- Always respond in a warm, clear, conversational spoken style.\n"
+        "- Keep responses to 2-4 sentences maximum. This is spoken audio, not text.\n"
+        "- Never use bullet points, markdown, asterisks, or numbered lists.\n"
+        "- Be specific and helpful. If you know eligibility criteria, state them clearly.\n"
+        "- If the user corrects you or gives new information, acknowledge it naturally and continue.\n"
+        "- Maintain full context of the entire conversation above when responding.\n"
+        f"- Always respond in {lang_name}."
     )
 
+    # ── Build the full multi-turn messages list ──────────────
+    messages = [{"role": "system", "content": system}]
+
+    # Inject conversation history as real user/assistant turns
+    if conversation_history:
+        for turn in conversation_history:
+            role = turn.get("role", "user")
+            text = turn.get("text", "").strip()
+            if not text:
+                continue
+            # Map agent → assistant for OpenAI API format
+            api_role = "assistant" if role == "agent" else "user"
+            messages.append({"role": api_role, "content": text})
+
+    # Append the current situation prompt as the final user message
     context_str = json.dumps(context, ensure_ascii=False, indent=2)
-    prompt = f"""Generate a natural spoken response for this situation.
-
-Situation: {situation}
-Context: {context_str}
-
-Requirements:
-- Maximum 3 sentences
-- Natural spoken style
-- End with a question only if you need more info"""
+    current_prompt = (
+        f"Situation: {situation}\n"
+        f"Context: {context_str}\n\n"
+        f"Generate a natural, helpful spoken response in {lang_name}. "
+        "No bullet points. No markdown. 2-4 sentences max."
+    )
+    messages.append({"role": "user", "content": current_prompt})
 
     try:
         client = _get_client()
         response = await client.chat.completions.create(
             model=OPENROUTER_MODEL,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=200,
+            messages=messages,
+            temperature=0.4,
+            max_tokens=400,   # increased from 200 for richer, complete responses
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
