@@ -8,6 +8,7 @@ import {
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './index.css';
+import './schemes-modal.css';
 import Landing from './pages/Landing';
 
 const API_BASE = 'http://localhost:8000';
@@ -289,6 +290,8 @@ export default function App() {
   const [endingChat, setEndingChat] = useState(false);
   const [schemeRecommendations, setSchemeRecommendations] = useState([]);
   const [profileComplete, setProfileComplete] = useState(false);
+  const [showAllSchemes, setShowAllSchemes] = useState(false);
+  const [howToApplyState, setHowToApplyState] = useState({ loading: false, data: null, error: null, audio: null });
 
   // History panel state
   const [showHistory, setShowHistory] = useState(false);
@@ -819,6 +822,38 @@ export default function App() {
     if (next) setTimeout(() => chatInputRef.current?.focus(), 150);
   };
 
+  const handleHowToApply = async (rec) => {
+    // If opening from the modal, we might want to close the All Schemes modal, or just layer over it.
+    // Let's close All Schemes to keep UI clean.
+    setShowAllSchemes(false);
+    setHowToApplyState({ loading: true, data: null, error: null, audio: null });
+    
+    try {
+      const res = await fetch(`${API_BASE}/schemes/how-to-apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scheme_name_en: rec.scheme_name_en || rec.scheme_name,
+          scheme_name_hi: rec.scheme_name_hi,
+          language: language
+        })
+      });
+      if (!res.ok) throw new Error('Network error');
+      const data = await res.json();
+      setHowToApplyState({ loading: false, data, error: null, audio: null });
+      
+      if (data.audio_b64) {
+        setStatus('speaking');
+        const audio = new Audio(`data:audio/mp3;base64,${data.audio_b64}`);
+        audio.play().catch(() => {});
+        audio.onended = () => setStatus('idle');
+        setHowToApplyState(prev => ({ ...prev, audio }));
+      }
+    } catch (err) {
+      setHowToApplyState({ loading: false, data: null, error: 'Failed to load guide. Please try again.', audio: null });
+    }
+  };
+
   // ── Status label helper ──────────────────────────────────────
   const statusLabel = {
     idle: language === 'hi' ? 'बोलने के लिए माइक दबाएं' : 'Hold Mic to Speak',
@@ -1286,7 +1321,7 @@ export default function App() {
                   : 'Recommended based on your profile'}
               </p>
               <div className="scheme-rec-list">
-                {schemeRecommendations.map((rec, i) => (
+                {schemeRecommendations.slice(0, 1).map((rec, i) => (
                   <div key={i} className={`scheme-rec-item ${rec.likely_eligible ? 'eligible' : 'partial'}`}>
                     <div className="scheme-rec-top">
                       <div className="scheme-rec-name">
@@ -1299,9 +1334,25 @@ export default function App() {
                       </span>
                     </div>
                     <div className="scheme-rec-reason">{rec.reason}</div>
+                    <button 
+                      className="how-to-apply-btn" 
+                      onClick={() => handleHowToApply(rec)}
+                      style={{ marginTop: '8px', padding: '4px 8px', fontSize: '0.75rem', borderRadius: '4px', border: '1px solid var(--saffron)', background: 'var(--saffron-pale)', color: 'var(--saffron-dim)', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      {language === 'hi' ? 'आवेदन कैसे करें?' : 'How to Apply?'}
+                    </button>
                   </div>
                 ))}
               </div>
+              {schemeRecommendations.length > 1 && (
+                <button
+                  className="scheme-rec-toggle-btn"
+                  onClick={() => setShowAllSchemes(true)}
+                  style={{ width: '100%', marginTop: '10px', padding: '6px', background: 'none', border: '1px dashed var(--border)', borderRadius: 'var(--r-xs)', color: 'var(--saffron-dim)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                  {language === 'hi' ? `सभी ${schemeRecommendations.length} दिखाएं` : `View all ${schemeRecommendations.length}`}
+                </button>
+              )}
             </div>
           ) : profileComplete ? (
             <div className="glass-panel scheme-rec-panel scheme-rec-loading">
@@ -1676,6 +1727,143 @@ export default function App() {
                   ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
                   : (language === 'hi' ? 'हाँ, समाप्त करें' : 'Yes, End It')}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── All Eligible Schemes Modal ── */}
+      {showAllSchemes && (
+        <div className="schemes-modal-overlay" onClick={() => setShowAllSchemes(false)}>
+          <div className="schemes-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="schemes-modal-header">
+              <div className="schemes-modal-title">
+                <Sparkles size={18} className="text-saffron" />
+                {language === 'hi' ? 'सभी पात्र योजनाएं' : 'All Eligible Schemes'}
+              </div>
+              <button className="modal-close-btn" onClick={() => setShowAllSchemes(false)} style={{ padding: '4px 8px' }}>
+                <X size={16} />
+              </button>
+            </div>
+            <div className="schemes-modal-body">
+              {schemeRecommendations.map((rec, i) => (
+                <div key={i} className={`scheme-rec-item ${rec.likely_eligible ? 'eligible' : 'partial'}`}>
+                  <div className="scheme-rec-top">
+                    <div className="scheme-rec-name" style={{ fontSize: '1rem' }}>
+                      {language === 'hi' ? rec.scheme_name_hi : rec.scheme_name_en}
+                    </div>
+                    <span className={`scheme-rec-badge ${rec.likely_eligible ? 'eligible' : 'partial'}`}>
+                      {rec.likely_eligible
+                        ? (language === 'hi' ? '✓ पात्र' : '✓ Eligible')
+                        : (language === 'hi' ? '~ आंशिक' : '~ Partial')}
+                    </span>
+                  </div>
+                  <div className="scheme-rec-reason" style={{ fontSize: '0.85rem' }}>{rec.reason}</div>
+                  <button 
+                    className="how-to-apply-btn" 
+                    onClick={() => handleHowToApply(rec)}
+                    style={{ marginTop: '8px', alignSelf: 'flex-start', padding: '4px 10px', fontSize: '0.8rem', borderRadius: '4px', border: '1px solid var(--saffron)', background: 'var(--saffron-pale)', color: 'var(--saffron-dim)', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    {language === 'hi' ? 'आवेदन कैसे करें?' : 'How to Apply?'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── How to Apply Modal ── */}
+      {(howToApplyState.loading || howToApplyState.data || howToApplyState.error) && (
+        <div className="schemes-modal-overlay" onClick={() => {
+          if (howToApplyState.audio) {
+            howToApplyState.audio.pause();
+            setStatus('idle');
+          }
+          setHowToApplyState({ loading: false, data: null, error: null, audio: null });
+        }}>
+          <div className="schemes-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
+            <div className="schemes-modal-header">
+              <div className="schemes-modal-title">
+                <Sparkles size={18} className="text-saffron" />
+                {howToApplyState.data ? howToApplyState.data.scheme_name : (language === 'hi' ? 'मार्गदर्शिका लोड हो रही है...' : 'Loading Guide...')}
+              </div>
+              <button className="modal-close-btn" onClick={() => {
+                if (howToApplyState.audio) {
+                  howToApplyState.audio.pause();
+                  setStatus('idle');
+                }
+                setHowToApplyState({ loading: false, data: null, error: null, audio: null });
+              }} style={{ padding: '4px 8px' }}>
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="schemes-modal-body">
+              {howToApplyState.loading && (
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                  <div className="scheme-rec-spinner"><div className="scheme-rec-dot" /><div className="scheme-rec-dot" /><div className="scheme-rec-dot" /></div>
+                  <p>{language === 'hi' ? 'आवेदन प्रक्रिया तैयार की जा रही है...' : 'Generating application steps...'}</p>
+                </div>
+              )}
+              
+              {howToApplyState.error && (
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--crimson)' }}>
+                  <AlertTriangle size={32} style={{ margin: '0 auto 12px' }} />
+                  <p>{howToApplyState.error}</p>
+                </div>
+              )}
+
+              {howToApplyState.data && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  
+                  {/* Speaker indicator */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'var(--cream-dark)', borderRadius: 'var(--r-sm)', color: 'var(--saffron)' }}>
+                    <Activity size={16} className={status === 'speaking' ? 'status-indicator-icon' : ''} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                      {status === 'speaking' 
+                        ? (language === 'hi' ? 'AI बोल रहा है...' : 'AI is speaking...')
+                        : (language === 'hi' ? 'मार्गदर्शिका' : 'Application Guide')}
+                    </span>
+                  </div>
+
+                  {/* Steps Roadmap */}
+                  <div>
+                    <h4 style={{ color: 'var(--text-dark)', marginBottom: '12px', fontSize: '1.05rem' }}>
+                      {language === 'hi' ? 'आवेदन करने के चरण' : 'Application Roadmap'}
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {howToApplyState.data.steps.map((step, idx) => (
+                        <div key={idx} style={{ display: 'flex', gap: '12px', background: 'var(--paper)', border: '1px solid var(--border)', padding: '12px', borderRadius: 'var(--r-sm)' }}>
+                          <div style={{ flexShrink: 0, width: '28px', height: '28px', borderRadius: '50%', background: 'var(--saffron)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                            {step.step_number}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 600, color: 'var(--text-dark)', fontSize: '0.95rem', marginBottom: '4px' }}>{step.title}</div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>{step.description}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Documents */}
+                  {howToApplyState.data.documents && howToApplyState.data.documents.length > 0 && (
+                    <div style={{ background: 'rgba(212, 114, 12, 0.05)', padding: '16px', borderRadius: 'var(--r-sm)', border: '1px solid rgba(212, 114, 12, 0.2)' }}>
+                      <h4 style={{ color: 'var(--text-dark)', marginBottom: '10px', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '1.2rem' }}>📄</span>
+                        {language === 'hi' ? 'आवश्यक दस्तावेज़' : 'Required Documents'}
+                      </h4>
+                      <ul style={{ margin: 0, paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {howToApplyState.data.documents.map((doc, idx) => (
+                          <li key={idx} style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{doc}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,0 +1,84 @@
+/* ================================================================
+   SCHEMES MODAL (View All & How to Apply)
+================================================================ */
+.schemes-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44, 24, 16, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fade-in 0.2s ease;
+}
+
+.schemes-modal {
+  background: var(--paper, #fff);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  border-radius: var(--r-md, 12px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-in 0.3s ease both;
+  border: 1px solid var(--border, #e5e5e5);
+}
+
+.schemes-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(160, 102, 58, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, var(--cream, #fdfbf7), var(--cream-dark, #f5f0e6));
+}
+
+.schemes-modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark, #2c1810);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schemes-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scrollbar-width: thin;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ================================================================
+   BUTTON HOVER EFFECTS
+================================================================ */
+.scheme-rec-toggle-btn:hover {
+  background: var(--saffron-pale, #fff6ed) !important;
+  color: var(--saffron, #d4720c) !important;
+  border-color: var(--saffron, #d4720c) !important;
+}
+
+.how-to-apply-btn {
+  transition: all 0.2s ease;
+}
+
+.how-to-apply-btn:hover {
+  background: var(--saffron, #d4720c) !important;
+  color: #fff !important;
+}

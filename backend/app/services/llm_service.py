@@ -343,3 +343,72 @@ Return ONLY the scheme_id (e.g., "PM-KISAN-001") or "UNKNOWN" if no match."""
     except Exception as e:
         logger.error(f"Scheme name resolution failed: {e}")
         return None
+
+
+async def generate_how_to_apply(
+    scheme_name_en: str,
+    scheme_name_hi: Optional[str] = None,
+    language: str = "hi",
+) -> Dict[str, Any]:
+    """
+    Generate a step-by-step application guide + required documents for a government scheme.
+
+    Returns a dict with:
+        steps: List[{step_number, title, description}]
+        documents: List[str]
+    """
+    if not OPENROUTER_API_KEY:
+        return {"steps": [], "documents": []}
+
+    scheme_display = scheme_name_en
+    if scheme_name_hi:
+        scheme_display = f"{scheme_name_en} / {scheme_name_hi}"
+
+    if language == "hi":
+        lang_instruction = "Respond in simple Hindi (Hinglish is fine for technical terms). Keep each step short and easy for a rural Indian user to follow."
+    else:
+        lang_instruction = "Respond in simple English. Keep each step clear and easy for a rural Indian user to follow."
+
+    prompt = f"""You are an expert on Indian government welfare schemes.
+Generate a practical step-by-step guide on how to apply for the scheme: "{scheme_display}".
+
+{lang_instruction}
+
+Return ONLY a valid JSON object (no markdown, no explanation) in this exact format:
+{{
+  "steps": [
+    {{"step_number": 1, "title": "short title", "description": "what to do in this step"}},
+    {{"step_number": 2, "title": "short title", "description": "what to do in this step"}},
+    ...
+  ],
+  "documents": ["Document 1", "Document 2", "Document 3", ...]
+}}
+
+Rules:
+- Provide 5-7 clear steps
+- Provide 5-8 required documents (aadhaar, bank passbook, etc.)
+- Steps should be actionable (go to CSC center, fill online form at pmkisan.gov.in, etc.)
+- Be specific about where to apply (official website, CSC, gram panchayat, bank branch, etc.)
+- If you don't know the exact details, give general government scheme application steps for India"""
+
+    try:
+        client = _get_client()
+        response = await client.chat.completions.create(
+            model=OPENROUTER_MODEL,
+            messages=[
+                {"role": "system", "content": "You are a JSON-only API. Output raw JSON without Markdown formatting."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=1200,
+        )
+        text = response.choices[0].message.content.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"):
+                text = text[4:]
+        result = json.loads(text.strip())
+        return result
+    except Exception as e:
+        logger.error(f"How-to-apply generation failed: {e}")
+        return {"steps": [], "documents": []}
