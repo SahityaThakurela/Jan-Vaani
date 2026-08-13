@@ -304,7 +304,11 @@ export default function App() {
   const [sessionActionLoading, setSessionActionLoading] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
 
-  // ── Text chat / questionnaire state ──────────────────────────
+  // ── Questionnaire / Text chat state ─────────────────────────
+  // questionnairePhase: true while the 7-question onboarding is running (default on login)
+  const [questionnairePhase, setQuestionnairePhase] = useState(false);
+  const questionnairePhaseRef = useRef(false);
+  // chatModeActive: whether text input box is visible (alternative to voice)
   const [chatModeActive, setChatModeActive] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [chatSending, setChatSending] = useState(false);
@@ -314,12 +318,20 @@ export default function App() {
   const chatInputRef = useRef(null);
   // Ref that mirrors chatModeActive for use inside closures (e.g. MediaRecorder.onstop)
   const chatModeActiveRef = useRef(false);
+  // Always-current session ID safe to use inside async closures after initSession
+  const sessionIdRef = useRef(null);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const transcriptEndRef = useRef(null);
   const silenceTimerRef = useRef(null);
   const audioContextRef = useRef(null);
+  // Guards against React Strict Mode double-invocation of initSession
+  const questionnaireTimerRef = useRef(null);
+  // Tracks the currently playing TTS audio so we can stop it before playing a new one
+  const currentTTSRef = useRef(null);
+  // Concurrency lock to prevent React Strict Mode from creating two sessions simultaneously
+  const initInProgressRef = useRef(false);
 
 
   useEffect(() => {
@@ -389,6 +401,8 @@ export default function App() {
   }, []);
 
   const initSession = async (lang) => {
+    if (initInProgressRef.current) return;
+    initInProgressRef.current = true;
     try {
       const res = await fetch(`${API_BASE}/sessions`, {
         method: 'POST',
@@ -400,7 +414,9 @@ export default function App() {
         if (res.status === 401) { handleLogout(); return; }
         return;
       }
-      setSessionId(data.session_id);
+      const sid = data.session_id;
+      sessionIdRef.current = sid;   // keep ref in sync before React state settles
+      setSessionId(sid);
       setTurns([]);
       setProfile({});
       setLatestEligibility(null);
@@ -408,11 +424,43 @@ export default function App() {
       setHandoffData(null);
       setSchemeRecommendations([]);
       setProfileComplete(false);
-      // Load any existing profile slots for this new session (usually empty)
-      await loadProfileFromDB(data.session_id);
+      setChatQState({ state: 'GREETING', currentQuestion: null });
+      setChatModeActive(false);
+      chatModeActiveRef.current = false;
+      await loadProfileFromDB(sid);
+
+      // ── Auto-start the onboarding questionnaire (voice-driven) ──────────
+      setQuestionnairePhase(true);
+      questionnairePhaseRef.current = true;
+      // Add a welcome bubble so the transcript isn't empty while greeting loads
+      setTurns([{
+        id: 'welcome',
+        userText: null,
+        agentText: lang === 'hi'
+          ? '🙏 नमस्ते! जन वाणी आपकी जानकारी एकत्र करने के लिए तैयार है। माइक दबाएं या "TEXT" से टाइप करें।'
+          : '🙏 Welcome! Jan Vaani is ready to collect your profile. Press the mic or use "TEXT" to type.',
+        action: 'WELCOME',
+      }]);
+
+      // Clear any pending kickoff from a previous initSession call
+      // and schedule a fresh one for THIS session ID only.
+      if (questionnaireTimerRef.current) clearTimeout(questionnaireTimerRef.current);
+      questionnaireTimerRef.current = setTimeout(() => {
+        questionnaireTimerRef.current = null;
+        kickoffQuestionnaire(sid, lang);
+      }, 800); // 800ms gives React state time to settle
     } catch (err) {
       console.error('Session init failed:', err);
+    } finally {
+      initInProgressRef.current = false;
     }
+  };
+
+  // ── Auto-trigger questionnaire greeting with TTS ──────────────
+  const kickoffQuestionnaire = async (sid, lang) => {
+    const greetingMsg = lang === 'hi' ? 'नमस्ते' : 'Hello';
+    // withAudio=true → get TTS for Q1; autoRecord=true → mic auto-starts after TTS
+    await sendChatMessage(greetingMsg, true, true, sid);
   };
 
   // ── End Chat ─────────────────────────────────────────────────
@@ -555,8 +603,8 @@ export default function App() {
       };
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        // If the questionnaire chat mode is active, route through STT-only → chat turn
-        if (chatModeActiveRef.current) {
+        // During questionnaire phase → STT-only route; after completion → full voice pipeline
+        if (questionnairePhaseRef.current) {
           await sendVoiceForChat(audioBlob);
         } else {
           await sendAudioTurn(audioBlob);
@@ -632,9 +680,11 @@ export default function App() {
   };
 
   const sendAudioTurn = async (audioBlob) => {
-    if (!sessionId) return;
+    // Use ref — avoids stale React state when called from MediaRecorder.onstop closure
+    const sid = sessionIdRef.current;
+    if (!sid) { setStatus('idle'); return; }
     const formData = new FormData();
-    formData.append('session_id', sessionId);
+    formData.append('session_id', sid);
     formData.append('language', language);
     formData.append('audio', audioBlob, 'turn.webm');
     try {
@@ -656,12 +706,12 @@ export default function App() {
       if (data.slots_extracted) setProfile(prev => ({ ...prev, ...data.slots_extracted }));
       if (data.eligibility_result) setLatestEligibility(data.eligibility_result);
       if (data.cross_scheme_matches) setCrossMatches(data.cross_scheme_matches);
-      if (data.handoff_triggered) fetchHandoff(sessionId);
+      if (data.handoff_triggered) fetchHandoff(sid);
       if (data.scheme_recommendations) setSchemeRecommendations(data.scheme_recommendations);
       if (data.profile_complete !== undefined) setProfileComplete(data.profile_complete);
 
       // Always re-fetch profile from DB after each turn to catch any DB-persisted slots
-      await loadProfileFromDB(sessionId);
+      await loadProfileFromDB(sid);
 
       if (data.audio_b64) {
         setStatus('speaking');
@@ -709,13 +759,15 @@ export default function App() {
     }
   };
 
-  // ── Voice-for-chat: STT only → questionnaire pipeline ────────
-  // Called when chatModeActive=true and user uses the mic.
+  // ── Voice-for-questionnaire: STT only → questionnaire pipeline ───
+  // Called when questionnairePhaseRef=true and user uses the mic.
   // Sends audio to /voice/transcribe for STT, then feeds text to sendChatMessage.
   const sendVoiceForChat = async (audioBlob) => {
-    if (!sessionId) return;
+    // Use ref — avoids stale React state when called from MediaRecorder.onstop closure
+    const sid = sessionIdRef.current;
+    if (!sid) { setStatus('idle'); return; }
     const formData = new FormData();
-    formData.append('session_id', sessionId);
+    formData.append('session_id', sid);
     formData.append('language', language);
     formData.append('audio', audioBlob, 'turn.webm');
     try {
@@ -731,9 +783,10 @@ export default function App() {
       const transcript = sttData.transcript?.trim();
       if (!transcript) { setStatus('idle'); return; }
 
-      // Step 2: Feed transcript into questionnaire with audio reply + auto-record next
+      // Step 2: Feed transcript into questionnaire
+      // autoRecord=true only if text-input mode is OFF (let voice chain continue)
       setStatus('idle');
-      await sendChatMessage(transcript, true, true);   // with_audio=true, autoRecord=true
+      await sendChatMessage(transcript, true, !chatModeActiveRef.current);
     } catch (err) {
       console.error('Voice-for-chat error:', err);
       setStatus('idle');
@@ -794,21 +847,28 @@ export default function App() {
   };
 
   // ── Text chat: send a message to /chat/turn ──────────────────
-  // withAudio=true → backend synthesizes TTS and returns audio_b64
-  // autoRecord=true → after TTS finishes, auto-start mic (voice-in-chat mode)
-  const sendChatMessage = async (msg, withAudio = false, autoRecord = false) => {
-    if (!sessionId || !msg.trim()) return;
+  // withAudio=true     → backend synthesizes TTS and returns audio_b64
+  // autoRecord=true    → after TTS finishes, auto-start mic (voice chain continues)
+  // overrideSessionId  → use this instead of React sessionId state (for initSession closures)
+  const sendChatMessage = async (msg, withAudio = false, autoRecord = false, overrideSessionId = null) => {
+    const sid = overrideSessionId || sessionIdRef.current;
+    if (!sid || !msg.trim()) return;
     const userMsg = msg.trim();
     setChatInput('');
     setChatSending(true);
     setChatTyping(true);
 
-    // Optimistically add user bubble (hide [Greeting] from chat history)
+    // Show user bubble (hide silent greeting triggers)
     const tempId = `chat-${Date.now()}`;
-    if (userMsg !== 'Hello' && userMsg !== 'नमस्ते') {
+    const isGreeting = userMsg === 'Hello' || userMsg === 'नमस्ते';
+    if (!isGreeting) {
       setTurns(prev => [...prev, { id: tempId, userText: userMsg, agentText: null, action: 'CHAT' }]);
     } else {
-      setTurns(prev => [...prev, { id: tempId, userText: null, agentText: null, action: 'CHAT' }]);
+      // Replace welcome bubble with a placeholder for the incoming agent greeting
+      setTurns(prev => [
+        ...prev.filter(t => t.id !== 'welcome'),
+        { id: tempId, userText: null, agentText: null, action: 'CHAT' },
+      ]);
     }
 
     try {
@@ -816,7 +876,7 @@ export default function App() {
         method: 'POST',
         headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
-          session_id: sessionId,
+          session_id: sid,
           message: userMsg,
           language,
           with_audio: withAudio,
@@ -832,15 +892,15 @@ export default function App() {
 
       setChatQState({ state: data.next_state, currentQuestion: data.current_question });
 
-      // Turn off text mode automatically when questionnaire is complete
+      // Questionnaire complete → exit questionnaire phase, unlock normal voice mode
       if (data.next_state === 'COMPLETE') {
-        setTimeout(() => {
-          setChatModeActive(false);
-          chatModeActiveRef.current = false;
-        }, 1500); // 1.5s delay so user sees the transition
+        setQuestionnairePhase(false);
+        questionnairePhaseRef.current = false;
+        setChatModeActive(false);
+        chatModeActiveRef.current = false;
       }
 
-      // Update the optimistic turn with agent reply + optional table
+      // Update turn with agent reply + optional summary table
       setTurns(prev => prev.map(t =>
         t.id === tempId
           ? { ...t, agentText: data.agent_text, tableMarkdown: data.table_markdown || null, action: 'CHAT' }
@@ -849,17 +909,25 @@ export default function App() {
 
       // Merge extracted slots into profile panel
       if (data.slots_extracted) setProfile(prev => ({ ...prev, ...data.slots_extracted }));
-      await loadProfileFromDB(sessionId);
+      await loadProfileFromDB(sid);
 
       // Play TTS audio if provided
       if (data.audio_b64) {
         setStatus('speaking');
+        // Stop any currently playing TTS (e.g. duplicate from Strict Mode double-init)
+        if (currentTTSRef.current) {
+          currentTTSRef.current.pause();
+          currentTTSRef.current.onended = null;
+          currentTTSRef.current = null;
+        }
         const audio = new Audio(`data:audio/mp3;base64,${data.audio_b64}`);
+        currentTTSRef.current = audio;
         audio.play().catch(() => { });
         audio.onended = () => {
+          currentTTSRef.current = null;
           setStatus('idle');
-          // Only auto-start mic in voice-driven chat mode (autoRecord flag)
-          if (chatModeActiveRef.current && autoRecord) {
+          // Auto-start mic for next answer only when voice chain is active
+          if (questionnairePhaseRef.current && autoRecord && !chatModeActiveRef.current) {
             startRecording();
           }
         };
@@ -870,19 +938,17 @@ export default function App() {
     } finally {
       setChatTyping(false);
       setChatSending(false);
-      // Refocus text input (only if in pure text mode, not voice mode)
       if (!withAudio) setTimeout(() => chatInputRef.current?.focus(), 80);
     }
   };
 
+  // ── Toggle text input visibility ─────────────────────────────
+  // During questionnaire: shows text box as alternative to voice.
+  // After questionnaire: shows text box for general queries (old behavior).
   const toggleChatMode = () => {
     const next = !chatModeActive;
     setChatModeActive(next);
-    chatModeActiveRef.current = next;   // keep ref in sync for closure use in onstop
-    if (next && sessionId && chatQState.state === 'GREETING') {
-      // Kick off the questionnaire with TTS greeting; do NOT auto-start mic (text mode)
-      sendChatMessage(language === 'hi' ? 'नमस्ते' : 'Hello', true, false);
-    }
+    chatModeActiveRef.current = next;
     if (next) setTimeout(() => chatInputRef.current?.focus(), 150);
   };
 
@@ -1161,11 +1227,11 @@ export default function App() {
                   className={`chat-mode-toggle ${chatModeActive ? 'active' : ''}`}
                   onClick={toggleChatMode}
                   title={chatModeActive
-                    ? (language === 'hi' ? '\u091f\u0947\u0915\u094d\u0938\u094d\u091f \u091a\u0948\u091f \u092c\u0902\u0926 \u0915\u0930\u0947\u0902' : 'Close text chat')
-                    : (language === 'hi' ? '\u091f\u0947\u0915\u094d\u0938\u094d\u091f \u092e\u0947\u0902 \u092a\u0942\u091b\u0947\u0902' : 'Ask via text')}
+                    ? (language === 'hi' ? 'वॉयस मोड पर वापस जाएं' : 'Switch to voice input')
+                    : (language === 'hi' ? 'टेक्स्ट से टाइप करें' : 'Switch to text input')}
                 >
                   <MessageCircle size={11} />
-                  {language === 'hi' ? '\u091f\u0947\u0915\u094d\u0938\u094d\u091f' : 'TEXT'}
+                  {language === 'hi' ? 'टेक्स्ट' : 'TEXT'}
                 </button>
                 <button
                   className="transcript-history-link"
@@ -1176,13 +1242,13 @@ export default function App() {
               </div>
             </div>
 
-            {/* Questionnaire progress bar */}
-            {chatModeActive && chatQState.state === 'COLLECTING' && chatQState.currentQuestion != null && (
+            {/* Questionnaire progress bar — visible whenever questionnaire is active */}
+            {questionnairePhase && chatQState.state === 'COLLECTING' && chatQState.currentQuestion != null && (
               <div style={{ padding: '6px 14px 0' }}>
                 <div className="chat-progress-badge">
                   <span>📝</span>
                   {language === 'hi'
-                    ? `\u092a\u094d\u0930\u0936\u094d\u0928 ${chatQState.currentQuestion} / 7`
+                    ? `प्रश्न ${chatQState.currentQuestion} / 7`
                     : `Question ${chatQState.currentQuestion} of 7`}
                 </div>
                 <div className="chat-progress-bar-track">
@@ -1201,12 +1267,12 @@ export default function App() {
                     <MessageSquare size={22} />
                   </div>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--text-dark)' }}>
-                    {language === 'hi' ? '\u0905\u092d\u0940 \u0924\u0915 \u0915\u094b\u0908 \u092c\u093e\u0924\u091a\u0940\u0924 \u0928\u0939\u0940\u0902 \u0939\u0941\u0908' : 'No conversations yet'}
+                    {language === 'hi' ? 'जन वाणी शुरू हो रही है…' : 'Jan Vaani is starting…'}
                   </h3>
                   <p style={{ marginTop: '6px', color: 'var(--text-muted)', fontSize: '0.83rem', lineHeight: 1.6 }}>
                     {language === 'hi'
-                      ? '\u092e\u093e\u0907\u0915 \u0926\u092c\u093e\u0915\u0930 \u092a\u0942\u091b\u0947\u0902 \u092f\u093e \u090a\u092a\u0930 "\u091f\u0947\u0915\u094d\u0938\u094d\u091f" \u092c\u091f\u0928 \u0938\u0947 \u0905\u092a\u0928\u0940 \u091c\u093e\u0928\u0915\u093e\u0930\u0940 \u092d\u0930\u0947\u0902\u0964'
-                      : 'Hold the mic to ask, or click "TEXT" above to fill your profile.'}
+                      ? 'AI आपका स्वागत करेगा और 7 सवाल पूछेगा।'
+                      : 'The AI will greet you and ask 7 quick profile questions.'}
                   </p>
                 </div>
               ) : (
