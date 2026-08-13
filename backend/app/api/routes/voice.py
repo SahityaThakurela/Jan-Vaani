@@ -13,11 +13,11 @@ POST /voice/interrupt
 import json
 import uuid
 from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from app.db.database import get_db
+from app.db.database import get_db, AsyncSessionLocal
 from app.models.db_models import (
     Session as DBSession, ConversationTurn,
     Scheme, SchemeEligibilityRule, SchemeRequiredSlot, HandoffRequest,
@@ -37,6 +37,7 @@ from app.utils.audio_utils import audio_bytes_to_base64
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 router = APIRouter()
 
 HANDOFF_CONFIDENCE_THRESHOLD = 0.45
@@ -55,6 +56,16 @@ UNIVERSAL_PROFILE_SLOTS = [
     {"slot_name": "family_size","slot_type": "number", "question_text_en": "How many members are in the user's family?"},
     {"slot_name": "bpl_status", "slot_type": "boolean","question_text_en": "Is the user below poverty line (BPL)? (true/false)"},
 ]
+
+async def _generate_and_save_title(session_id: str, user_text: str, language: str):
+    """Background task to generate and save a session title."""
+    title = await llm_service.generate_session_title(user_text, language)
+    async with AsyncSessionLocal() as db:
+        session_result = await db.execute(select(DBSession).where(DBSession.session_id == session_id))
+        db_session = session_result.scalar_one_or_none()
+        if db_session:
+            db_session.title = title
+            await db.commit()
 
 
 @router.post("/transcribe")
@@ -87,6 +98,7 @@ async def transcribe_only(
 @router.post("/turn", response_model=VoiceTurnResponse)
 
 async def voice_turn(
+    background_tasks: BackgroundTasks,
     session_id: str = Form(...),
     language: str = Form(default="hi"),
     audio: UploadFile = File(...),
@@ -120,6 +132,9 @@ async def voice_turn(
     stt_confidence = stt_result["confidence"]
 
     logger.info(f"[{session_id}] Turn {turn_number} — user: '{user_text[:80]}'")
+
+    if not db_session.title and turn_number == 1:
+        background_tasks.add_task(_generate_and_save_title, session_id, user_text, language)
 
     # ── 2. State machine routing ──────────────────────────────
     agent_text = ""

@@ -16,6 +16,7 @@ class SessionCreate(BaseModel):
 
 class SessionResponse(BaseModel):
     session_id: str
+    title: Optional[str] = None
     language: str
     status: str
     current_state: str
