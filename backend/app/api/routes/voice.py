@@ -24,7 +24,7 @@ from app.models.db_models import (
 )
 from app.models.schemas import (
     VoiceTurnResponse, InterruptRequest, InterruptResponse,
-    EligibilityResult, CrossSchemeMatch,
+    EligibilityResult, CrossSchemeMatch, SchemeRecommendation,
 )
 from app.core.state_machine import get_state_machine, SessionState
 from app.core.slot_manager import get_slot_manager
@@ -42,6 +42,10 @@ router = APIRouter()
 
 HANDOFF_CONFIDENCE_THRESHOLD = 0.45
 MAX_LOW_CONF_TURNS = 3
+
+# ── Profile completeness for auto-recommendation ─────────────────
+KEY_PROFILE_SLOTS = ['age', 'gender', 'income', 'caste', 'state', 'occupation', 'bpl_status']
+RECOMMENDATION_THRESHOLD = 4   # need at least 4 of 7 key slots filled
 
 # Common user profile fields extracted from every turn
 UNIVERSAL_PROFILE_SLOTS = [
@@ -144,6 +148,8 @@ async def voice_turn(
     eligibility_result: Optional[EligibilityResult] = None
     cross_matches: List[CrossSchemeMatch] = []
     handoff_triggered = False
+    scheme_recommendations: list = []
+    profile_complete = False
 
     # Get conversation history for context — fetch BOTH user & agent turns in order
     turns_result = await db.execute(
@@ -349,6 +355,7 @@ async def voice_turn(
     # ── 4. Universal profile slot extraction (runs every turn) ──
     # Extract common profile facts from the user's utterance regardless of intent.
     # This runs even when the deterministic eligibility engine is disabled.
+    universal_extracted: Dict[str, Any] = {}
     try:
         universal_extracted = await llm_service.extract_slots(
             user_text, UNIVERSAL_PROFILE_SLOTS, language
@@ -360,6 +367,41 @@ async def voice_turn(
             logger.info(f"[{session_id}] Universal slots extracted: {list(universal_extracted.keys())}")
     except Exception as slot_err:
         logger.warning(f"[{session_id}] Universal slot extraction failed (non-critical): {slot_err}")
+
+    # ── 4b. Auto-recommendation: trigger when profile is sufficiently filled ──
+    # Count how many KEY slots are filled before and after this turn.
+    profile_now = slot_mgr.get_profile()
+    filled_key_count = sum(1 for s in KEY_PROFILE_SLOTS if profile_now.get(s))
+    profile_complete = filled_key_count >= RECOMMENDATION_THRESHOLD
+
+    if profile_complete:
+        try:
+            raw_recs = await llm_service.recommend_eligible_schemes(profile_now, language)
+            scheme_recommendations = raw_recs
+
+            # Count key slots that were newly filled THIS turn
+            newly_filled = sum(
+                1 for s in KEY_PROFILE_SLOTS
+                if s in (universal_extracted or {}) and s in profile_now
+            )
+            # If this turn pushed us over the threshold, append recommendation to spoken reply
+            key_slots_before = filled_key_count - len([s for s in (universal_extracted or {})
+                                                        if s in KEY_PROFILE_SLOTS])
+            just_crossed = key_slots_before < RECOMMENDATION_THRESHOLD and profile_complete
+            if just_crossed and scheme_recommendations:
+                names = [r.get('scheme_name_hi' if language == 'hi' else 'scheme_name_en', '')
+                         for r in scheme_recommendations]
+                names_str = ', '.join(names)
+                if language == 'hi':
+                    rec_text = (f" आपकी जानकारी के आधार पर, आप इन योजनाओं के पात्र हो सकते हैं: "
+                                f"{names_str}। मैंने आपकी स्क्रीन पर भी यह दिखाया है।")
+                else:
+                    rec_text = (f" Based on your profile, you may be eligible for: "
+                                f"{names_str}. I've also shown these on your screen.")
+                agent_text = agent_text + rec_text
+            logger.info(f"[{session_id}] Scheme recommendations generated: {[r.get('scheme_name_en') for r in scheme_recommendations]}")
+        except Exception as rec_err:
+            logger.warning(f"[{session_id}] Scheme recommendation failed (non-critical): {rec_err}")
 
     # ── 5. Persist turn + slots ────────────────────────────────
     db.add(ConversationTurn(
@@ -394,6 +436,8 @@ async def voice_turn(
         eligibility_result=eligibility_result,
         handoff_triggered=handoff_triggered,
         cross_scheme_matches=cross_matches or None,
+        scheme_recommendations=[SchemeRecommendation(**r) for r in scheme_recommendations] if scheme_recommendations else None,
+        profile_complete=profile_complete,
     )
 
 

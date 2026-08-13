@@ -240,6 +240,68 @@ async def generate_session_title(user_query: str, language: str = "hi") -> str:
         logger.error(f"Title generation failed: {e}")
         return "New Chat"
 
+async def recommend_eligible_schemes(
+    profile: dict,
+    language: str = "hi",
+) -> list:
+    """
+    Given a filled user profile, ask the LLM to recommend 2-3 government schemes
+    the user is likely eligible for. Returns a list of dicts:
+      [{"scheme_name_en": ..., "scheme_name_hi": ..., "likely_eligible": bool, "reason": ...}]
+    """
+    if not OPENROUTER_API_KEY:
+        return []
+
+    profile_str = "\n".join(f"- {k}: {v}" for k, v in profile.items())
+    lang_name = "Hindi" if language == "hi" else "English"
+
+    prompt = f"""You are Jan Vaani, an expert on Indian government welfare schemes.
+A rural citizen has provided the following profile information:
+
+{profile_str}
+
+Based on this profile, identify the 2-3 MOST relevant Indian government welfare schemes
+(like PM-KISAN, PMAY-G, Ayushman Bharat, MGNREGA, PM Ujjwala Yojana, PM Fasal Bima Yojana,
+Pradhan Mantri Shram Yogi Maan-Dhan, National Social Assistance Programme, Sukanya Samriddhi,
+Beti Bachao Beti Padhao, PM Awas Yojana, etc.) that this person is MOST LIKELY ELIGIBLE for.
+
+Respond with ONLY a valid JSON array (no markdown, no explanation):
+[
+  {{
+    "scheme_name_en": "English scheme name",
+    "scheme_name_hi": "Hindi scheme name",
+    "likely_eligible": true,
+    "reason": "One sentence reason in {lang_name} why they qualify"
+  }},
+  ...
+]
+Limit to 3 schemes maximum. Only include schemes with high eligibility likelihood."""
+
+    try:
+        client = _get_client()
+        response = await client.chat.completions.create(
+            model=OPENROUTER_MODEL,
+            messages=[
+                {"role": "system", "content": "You are a JSON-only API. Output raw JSON array without Markdown."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.2,
+            max_tokens=600,
+        )
+        text = response.choices[0].message.content.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"):
+                text = text[4:]
+        result = json.loads(text.strip())
+        if isinstance(result, list):
+            return result[:3]
+        return []
+    except Exception as e:
+        logger.error(f"Scheme recommendation failed: {e}")
+        return []
+
+
 async def resolve_scheme_name(
     spoken_name: str,
     available_schemes: List[Dict[str, str]],

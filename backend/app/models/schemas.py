@@ -48,6 +48,14 @@ class SchemeOut(BaseModel):
 # ─────────────────────────────────────────────────────────────
 # Voice Pipeline
 # ─────────────────────────────────────────────────────────────
+class SchemeRecommendation(BaseModel):
+    """A scheme recommendation generated when user profile is sufficiently filled."""
+    scheme_name_en: str
+    scheme_name_hi: str
+    likely_eligible: bool = True
+    reason: str
+
+
 class VoiceTurnResponse(BaseModel):
     """Response for POST /voice/turn — the main pipeline endpoint."""
     session_id: str
@@ -62,6 +70,8 @@ class VoiceTurnResponse(BaseModel):
     eligibility_result: Optional["EligibilityResult"] = None
     handoff_triggered: bool = False
     cross_scheme_matches: Optional[List["CrossSchemeMatch"]] = None
+    scheme_recommendations: Optional[List["SchemeRecommendation"]] = None
+    profile_complete: bool = False
 
 
 class InterruptRequest(BaseModel):

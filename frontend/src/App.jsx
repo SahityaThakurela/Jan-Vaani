@@ -69,40 +69,40 @@ function Waveform() {
 function RuralFarmer({ className }) {
   return (
     <svg viewBox="0 0 120 130" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <circle cx="90" cy="20" r="12" fill="#F5A623" opacity="0.85"/>
+      <circle cx="90" cy="20" r="12" fill="#F5A623" opacity="0.85" />
       <g stroke="#F5A623" strokeWidth="2" opacity="0.6">
-        <line x1="90" y1="2" x2="90" y2="6"/>
-        <line x1="90" y1="34" x2="90" y2="38"/>
-        <line x1="72" y1="20" x2="68" y2="20"/>
-        <line x1="108" y1="20" x2="112" y2="20"/>
+        <line x1="90" y1="2" x2="90" y2="6" />
+        <line x1="90" y1="34" x2="90" y2="38" />
+        <line x1="72" y1="20" x2="68" y2="20" />
+        <line x1="108" y1="20" x2="112" y2="20" />
       </g>
-      <ellipse cx="30" cy="88" rx="22" ry="13" fill="#E8D5B7"/>
-      <ellipse cx="30" cy="88" rx="22" ry="13" fill="none" stroke="#C4A882" strokeWidth="1.5"/>
-      <ellipse cx="24" cy="84" rx="5" ry="4" fill="#C4A882" opacity="0.5"/>
-      <ellipse cx="36" cy="92" rx="4" ry="3" fill="#C4A882" opacity="0.5"/>
-      <ellipse cx="52" cy="82" rx="10" ry="9" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1.5"/>
-      <ellipse cx="47" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1"/>
-      <ellipse cx="57" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1"/>
-      <path d="M44 74 Q40 65 43 62" stroke="#A0663A" strokeWidth="2" fill="none"/>
-      <path d="M55 74 Q59 65 57 62" stroke="#A0663A" strokeWidth="2" fill="none"/>
-      <rect x="14" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
-      <rect x="23" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
-      <rect x="34" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
-      <rect x="43" y="98" width="5" height="16" rx="2" fill="#C4A882"/>
-      <path d="M8 86 Q2 80 6 74 Q8 72 10 76" stroke="#C4A882" strokeWidth="2" fill="none"/>
-      <circle cx="72" cy="62" r="10" fill="#FDBF6F"/>
-      <path d="M62 58 Q72 48 82 58" fill="#D4720C"/>
-      <circle cx="72" cy="50" r="4" fill="#D4720C"/>
-      <circle cx="69" cy="62" r="1.5" fill="#3D2B1F"/>
-      <circle cx="75" cy="62" r="1.5" fill="#3D2B1F"/>
-      <path d="M68 66 Q72 70 76 66" stroke="#3D2B1F" strokeWidth="1.5" fill="none"/>
-      <path d="M65 72 Q72 68 79 72 L82 95 L62 95 Z" fill="#F5F0E8"/>
-      <path d="M64 72 Q72 68 80 72 L79 82 L65 82 Z" fill="#E8803A"/>
-      <path d="M65 74 Q54 78 52 82" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none"/>
-      <path d="M79 74 Q85 80 82 86" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none"/>
-      <path d="M65 95 L60 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round"/>
-      <path d="M79 95 L84 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round"/>
-      <ellipse cx="60" cy="118" rx="55" ry="5" fill="#2D6A4F" opacity="0.15"/>
+      <ellipse cx="30" cy="88" rx="22" ry="13" fill="#E8D5B7" />
+      <ellipse cx="30" cy="88" rx="22" ry="13" fill="none" stroke="#C4A882" strokeWidth="1.5" />
+      <ellipse cx="24" cy="84" rx="5" ry="4" fill="#C4A882" opacity="0.5" />
+      <ellipse cx="36" cy="92" rx="4" ry="3" fill="#C4A882" opacity="0.5" />
+      <ellipse cx="52" cy="82" rx="10" ry="9" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1.5" />
+      <ellipse cx="47" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1" />
+      <ellipse cx="57" cy="74" rx="4" ry="3" fill="#E8D5B7" stroke="#C4A882" strokeWidth="1" />
+      <path d="M44 74 Q40 65 43 62" stroke="#A0663A" strokeWidth="2" fill="none" />
+      <path d="M55 74 Q59 65 57 62" stroke="#A0663A" strokeWidth="2" fill="none" />
+      <rect x="14" y="98" width="5" height="16" rx="2" fill="#C4A882" />
+      <rect x="23" y="98" width="5" height="16" rx="2" fill="#C4A882" />
+      <rect x="34" y="98" width="5" height="16" rx="2" fill="#C4A882" />
+      <rect x="43" y="98" width="5" height="16" rx="2" fill="#C4A882" />
+      <path d="M8 86 Q2 80 6 74 Q8 72 10 76" stroke="#C4A882" strokeWidth="2" fill="none" />
+      <circle cx="72" cy="62" r="10" fill="#FDBF6F" />
+      <path d="M62 58 Q72 48 82 58" fill="#D4720C" />
+      <circle cx="72" cy="50" r="4" fill="#D4720C" />
+      <circle cx="69" cy="62" r="1.5" fill="#3D2B1F" />
+      <circle cx="75" cy="62" r="1.5" fill="#3D2B1F" />
+      <path d="M68 66 Q72 70 76 66" stroke="#3D2B1F" strokeWidth="1.5" fill="none" />
+      <path d="M65 72 Q72 68 79 72 L82 95 L62 95 Z" fill="#F5F0E8" />
+      <path d="M64 72 Q72 68 80 72 L79 82 L65 82 Z" fill="#E8803A" />
+      <path d="M65 74 Q54 78 52 82" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path d="M79 74 Q85 80 82 86" stroke="#FDBF6F" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path d="M65 95 L60 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round" />
+      <path d="M79 95 L84 115" stroke="#F5F0E8" strokeWidth="7" strokeLinecap="round" />
+      <ellipse cx="60" cy="118" rx="55" ry="5" fill="#2D6A4F" opacity="0.15" />
     </svg>
   );
 }
@@ -110,29 +110,29 @@ function RuralFarmer({ className }) {
 function RuralWomanWater({ className }) {
   return (
     <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <ellipse cx="40" cy="16" rx="18" ry="10" fill="#C1440E" opacity="0.9"/>
-      <rect x="22" y="12" width="36" height="20" rx="2" fill="#C1440E"/>
-      <ellipse cx="40" cy="32" rx="18" ry="8" fill="#A03008"/>
-      <ellipse cx="40" cy="14" rx="12" ry="5" fill="#87CEEB" opacity="0.6"/>
-      <ellipse cx="40" cy="42" rx="12" ry="6" fill="#D4720C" opacity="0.8"/>
-      <circle cx="40" cy="52" r="13" fill="#FDBF6F"/>
-      <circle cx="40" cy="42" r="7" fill="#3D2B1F"/>
-      <circle cx="36" cy="52" r="1.8" fill="#3D2B1F"/>
-      <circle cx="44" cy="52" r="1.8" fill="#3D2B1F"/>
-      <circle cx="36.5" cy="51.5" r="0.5" fill="white"/>
-      <circle cx="44.5" cy="51.5" r="0.5" fill="white"/>
-      <circle cx="40" cy="56" r="0.8" fill="#A0663A"/>
-      <path d="M36 59 Q40 63 44 59" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
-      <path d="M28 65 Q40 60 52 65 L55 105 L25 105 Z" fill="#E8803A"/>
-      <path d="M52 65 Q58 70 55 80 L52 75 Z" fill="#D4720C"/>
-      <rect x="25" y="100" width="30" height="5" fill="#D4720C"/>
-      <path d="M28 68 L22 45 L26 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      <path d="M52 68 L58 45 L54 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      <path d="M25 105 Q30 130 35 135 L45 135 Q50 130 55 105 Z" fill="#E8803A"/>
-      <ellipse cx="35" cy="136" rx="7" ry="4" fill="#FDBF6F"/>
-      <ellipse cx="45" cy="136" rx="7" ry="4" fill="#FDBF6F"/>
-      <rect x="28" y="132" width="14" height="2" rx="1" fill="#E8C547"/>
-      <rect x="38" y="132" width="14" height="2" rx="1" fill="#E8C547"/>
+      <ellipse cx="40" cy="16" rx="18" ry="10" fill="#C1440E" opacity="0.9" />
+      <rect x="22" y="12" width="36" height="20" rx="2" fill="#C1440E" />
+      <ellipse cx="40" cy="32" rx="18" ry="8" fill="#A03008" />
+      <ellipse cx="40" cy="14" rx="12" ry="5" fill="#87CEEB" opacity="0.6" />
+      <ellipse cx="40" cy="42" rx="12" ry="6" fill="#D4720C" opacity="0.8" />
+      <circle cx="40" cy="52" r="13" fill="#FDBF6F" />
+      <circle cx="40" cy="42" r="7" fill="#3D2B1F" />
+      <circle cx="36" cy="52" r="1.8" fill="#3D2B1F" />
+      <circle cx="44" cy="52" r="1.8" fill="#3D2B1F" />
+      <circle cx="36.5" cy="51.5" r="0.5" fill="white" />
+      <circle cx="44.5" cy="51.5" r="0.5" fill="white" />
+      <circle cx="40" cy="56" r="0.8" fill="#A0663A" />
+      <path d="M36 59 Q40 63 44 59" stroke="#A0663A" strokeWidth="1.5" fill="none" />
+      <path d="M28 65 Q40 60 52 65 L55 105 L25 105 Z" fill="#E8803A" />
+      <path d="M52 65 Q58 70 55 80 L52 75 Z" fill="#D4720C" />
+      <rect x="25" y="100" width="30" height="5" fill="#D4720C" />
+      <path d="M28 68 L22 45 L26 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M52 68 L58 45 L54 43" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M25 105 Q30 130 35 135 L45 135 Q50 130 55 105 Z" fill="#E8803A" />
+      <ellipse cx="35" cy="136" rx="7" ry="4" fill="#FDBF6F" />
+      <ellipse cx="45" cy="136" rx="7" ry="4" fill="#FDBF6F" />
+      <rect x="28" y="132" width="14" height="2" rx="1" fill="#E8C547" />
+      <rect x="38" y="132" width="14" height="2" rx="1" fill="#E8C547" />
     </svg>
   );
 }
@@ -140,29 +140,29 @@ function RuralWomanWater({ className }) {
 function RuralPlanter({ className }) {
   return (
     <svg viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <path d="M72 110 L80 90 L100 90 L108 110 Z" fill="#C1440E" opacity="0.85"/>
-      <ellipse cx="90" cy="90" rx="14" ry="6" fill="#A03008"/>
-      <path d="M90 90 Q75 70 70 55 Q85 65 90 90" fill="#2D6A4F"/>
-      <path d="M90 90 Q105 70 110 55 Q95 65 90 90" fill="#52B788"/>
-      <path d="M90 90 Q80 75 75 65 Q88 72 90 90" fill="#1A4A2E"/>
-      <rect x="10" y="68" width="22" height="16" rx="4" fill="#6B4226"/>
-      <path d="M32 74 Q45 72 48 78 Q45 84 32 80 Z" fill="#6B4226"/>
-      <circle cx="50" cy="82" r="2" fill="#87CEEB" opacity="0.8"/>
-      <circle cx="54" cy="86" r="1.5" fill="#87CEEB" opacity="0.7"/>
-      <circle cx="52" cy="91" r="1" fill="#87CEEB" opacity="0.6"/>
-      <path d="M10 68 Q5 62 10 56 L18 56 Q14 62 18 68" fill="#6B4226"/>
-      <circle cx="35" cy="35" r="12" fill="#FDBF6F"/>
-      <path d="M24 32 Q35 22 46 32" fill="#3D2B1F"/>
-      <circle cx="31" cy="36" r="1.5" fill="#3D2B1F"/>
-      <circle cx="39" cy="36" r="1.5" fill="#3D2B1F"/>
-      <path d="M30 41 Q35 45 40 41" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
-      <path d="M28 47 Q35 44 42 47 L50 75 L20 75 Z" fill="#2D6A4F"/>
-      <rect x="20" y="70" width="30" height="4" rx="2" fill="#1A4A2E"/>
-      <path d="M20 75 L18 110 Q35 115 52 110 L50 75 Z" fill="#F5F0E8"/>
-      <path d="M28 50 Q18 60 12 72" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      <path d="M42 50 Q48 58 46 65" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      <ellipse cx="24" cy="112" rx="8" ry="4" fill="#FDBF6F"/>
-      <ellipse cx="46" cy="112" rx="8" ry="4" fill="#FDBF6F"/>
+      <path d="M72 110 L80 90 L100 90 L108 110 Z" fill="#C1440E" opacity="0.85" />
+      <ellipse cx="90" cy="90" rx="14" ry="6" fill="#A03008" />
+      <path d="M90 90 Q75 70 70 55 Q85 65 90 90" fill="#2D6A4F" />
+      <path d="M90 90 Q105 70 110 55 Q95 65 90 90" fill="#52B788" />
+      <path d="M90 90 Q80 75 75 65 Q88 72 90 90" fill="#1A4A2E" />
+      <rect x="10" y="68" width="22" height="16" rx="4" fill="#6B4226" />
+      <path d="M32 74 Q45 72 48 78 Q45 84 32 80 Z" fill="#6B4226" />
+      <circle cx="50" cy="82" r="2" fill="#87CEEB" opacity="0.8" />
+      <circle cx="54" cy="86" r="1.5" fill="#87CEEB" opacity="0.7" />
+      <circle cx="52" cy="91" r="1" fill="#87CEEB" opacity="0.6" />
+      <path d="M10 68 Q5 62 10 56 L18 56 Q14 62 18 68" fill="#6B4226" />
+      <circle cx="35" cy="35" r="12" fill="#FDBF6F" />
+      <path d="M24 32 Q35 22 46 32" fill="#3D2B1F" />
+      <circle cx="31" cy="36" r="1.5" fill="#3D2B1F" />
+      <circle cx="39" cy="36" r="1.5" fill="#3D2B1F" />
+      <path d="M30 41 Q35 45 40 41" stroke="#A0663A" strokeWidth="1.5" fill="none" />
+      <path d="M28 47 Q35 44 42 47 L50 75 L20 75 Z" fill="#2D6A4F" />
+      <rect x="20" y="70" width="30" height="4" rx="2" fill="#1A4A2E" />
+      <path d="M20 75 L18 110 Q35 115 52 110 L50 75 Z" fill="#F5F0E8" />
+      <path d="M28 50 Q18 60 12 72" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M42 50 Q48 58 46 65" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <ellipse cx="24" cy="112" rx="8" ry="4" fill="#FDBF6F" />
+      <ellipse cx="46" cy="112" rx="8" ry="4" fill="#FDBF6F" />
     </svg>
   );
 }
@@ -170,43 +170,43 @@ function RuralPlanter({ className }) {
 function RuralHarvestWoman({ className }) {
   return (
     <svg viewBox="0 0 80 150" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <ellipse cx="40" cy="18" rx="24" ry="10" fill="#E8C547" opacity="0.9"/>
+      <ellipse cx="40" cy="18" rx="24" ry="10" fill="#E8C547" opacity="0.9" />
       <g stroke="#A0663A" strokeWidth="2">
-        <line x1="30" y1="8" x2="24" y2="-2"/>
-        <line x1="35" y1="6" x2="32" y2="-4"/>
-        <line x1="40" y1="5" x2="40" y2="-5"/>
-        <line x1="45" y1="6" x2="48" y2="-4"/>
-        <line x1="50" y1="8" x2="56" y2="-2"/>
+        <line x1="30" y1="8" x2="24" y2="-2" />
+        <line x1="35" y1="6" x2="32" y2="-4" />
+        <line x1="40" y1="5" x2="40" y2="-5" />
+        <line x1="45" y1="6" x2="48" y2="-4" />
+        <line x1="50" y1="8" x2="56" y2="-2" />
       </g>
-      <ellipse cx="24" cy="-3" rx="4" ry="7" fill="#E8C547"/>
-      <ellipse cx="32" cy="-5" rx="3" ry="6" fill="#D4A020"/>
-      <ellipse cx="40" cy="-6" rx="4" ry="7" fill="#E8C547"/>
-      <ellipse cx="48" cy="-5" rx="3" ry="6" fill="#D4A020"/>
-      <ellipse cx="56" cy="-3" rx="4" ry="7" fill="#E8C547"/>
-      <path d="M16 14 L20 36 L60 36 L64 14 Z" fill="#C1440E" opacity="0.8"/>
-      <ellipse cx="40" cy="36" rx="20" ry="7" fill="#A03008"/>
-      <path d="M20 20 L60 20" stroke="#A03008" strokeWidth="1" opacity="0.5"/>
-      <path d="M19 26 L61 26" stroke="#A03008" strokeWidth="1" opacity="0.5"/>
-      <ellipse cx="40" cy="46" rx="13" ry="7" fill="#E8803A" opacity="0.8"/>
-      <circle cx="40" cy="56" r="13" fill="#FDBF6F"/>
-      <circle cx="40" cy="46" r="8" fill="#3D2B1F"/>
-      <circle cx="28" cy="56" r="2.5" fill="#E8C547"/>
-      <circle cx="52" cy="56" r="2.5" fill="#E8C547"/>
-      <circle cx="36" cy="55" r="1.8" fill="#3D2B1F"/>
-      <circle cx="44" cy="55" r="1.8" fill="#3D2B1F"/>
-      <circle cx="36.5" cy="54.5" r="0.5" fill="white"/>
-      <circle cx="40" cy="51" r="1.2" fill="#C1440E"/>
-      <path d="M35 60 Q40 64 45 60" stroke="#A0663A" strokeWidth="1.5" fill="none"/>
-      <path d="M28 69 Q40 63 52 69 L54 88 L26 88 Z" fill="#C1440E"/>
-      <path d="M52 69 Q58 72 56 82 L52 78 Z" fill="#A03008"/>
-      <path d="M28 70 L24 47 L28 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      <path d="M52 70 L56 47 L52 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none"/>
-      <path d="M26 88 Q28 118 32 128 L48 128 Q52 118 54 88 Z" fill="#E8803A"/>
-      <rect x="26" y="120" width="28" height="5" fill="#C1440E"/>
-      <ellipse cx="33" cy="130" rx="7" ry="4" fill="#FDBF6F"/>
-      <ellipse cx="47" cy="130" rx="7" ry="4" fill="#FDBF6F"/>
-      <rect x="29" y="128" width="8" height="1.5" rx="1" fill="#E8C547"/>
-      <rect x="43" y="128" width="8" height="1.5" rx="1" fill="#E8C547"/>
+      <ellipse cx="24" cy="-3" rx="4" ry="7" fill="#E8C547" />
+      <ellipse cx="32" cy="-5" rx="3" ry="6" fill="#D4A020" />
+      <ellipse cx="40" cy="-6" rx="4" ry="7" fill="#E8C547" />
+      <ellipse cx="48" cy="-5" rx="3" ry="6" fill="#D4A020" />
+      <ellipse cx="56" cy="-3" rx="4" ry="7" fill="#E8C547" />
+      <path d="M16 14 L20 36 L60 36 L64 14 Z" fill="#C1440E" opacity="0.8" />
+      <ellipse cx="40" cy="36" rx="20" ry="7" fill="#A03008" />
+      <path d="M20 20 L60 20" stroke="#A03008" strokeWidth="1" opacity="0.5" />
+      <path d="M19 26 L61 26" stroke="#A03008" strokeWidth="1" opacity="0.5" />
+      <ellipse cx="40" cy="46" rx="13" ry="7" fill="#E8803A" opacity="0.8" />
+      <circle cx="40" cy="56" r="13" fill="#FDBF6F" />
+      <circle cx="40" cy="46" r="8" fill="#3D2B1F" />
+      <circle cx="28" cy="56" r="2.5" fill="#E8C547" />
+      <circle cx="52" cy="56" r="2.5" fill="#E8C547" />
+      <circle cx="36" cy="55" r="1.8" fill="#3D2B1F" />
+      <circle cx="44" cy="55" r="1.8" fill="#3D2B1F" />
+      <circle cx="36.5" cy="54.5" r="0.5" fill="white" />
+      <circle cx="40" cy="51" r="1.2" fill="#C1440E" />
+      <path d="M35 60 Q40 64 45 60" stroke="#A0663A" strokeWidth="1.5" fill="none" />
+      <path d="M28 69 Q40 63 52 69 L54 88 L26 88 Z" fill="#C1440E" />
+      <path d="M52 69 Q58 72 56 82 L52 78 Z" fill="#A03008" />
+      <path d="M28 70 L24 47 L28 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M52 70 L56 47 L52 45" stroke="#FDBF6F" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M26 88 Q28 118 32 128 L48 128 Q52 118 54 88 Z" fill="#E8803A" />
+      <rect x="26" y="120" width="28" height="5" fill="#C1440E" />
+      <ellipse cx="33" cy="130" rx="7" ry="4" fill="#FDBF6F" />
+      <ellipse cx="47" cy="130" rx="7" ry="4" fill="#FDBF6F" />
+      <rect x="29" y="128" width="8" height="1.5" rx="1" fill="#E8C547" />
+      <rect x="43" y="128" width="8" height="1.5" rx="1" fill="#E8C547" />
     </svg>
   );
 }
@@ -240,12 +240,12 @@ function TypewriterText({ texts, speed = 50, pause = 2000 }) {
   useEffect(() => {
     let timer;
     const currentText = texts[textIndex];
-    
+
     if (isDeleting) {
       if (displayedText === '') {
         setIsDeleting(false);
         setTextIndex((prev) => (prev + 1) % texts.length);
-        timer = setTimeout(() => {}, 500);
+        timer = setTimeout(() => { }, 500);
       } else {
         timer = setTimeout(() => {
           setDisplayedText(currentText.substring(0, displayedText.length - 1));
@@ -287,6 +287,8 @@ export default function App() {
   const [handoffData, setHandoffData] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [endingChat, setEndingChat] = useState(false);
+  const [schemeRecommendations, setSchemeRecommendations] = useState([]);
+  const [profileComplete, setProfileComplete] = useState(false);
 
   // History panel state
   const [showHistory, setShowHistory] = useState(false);
@@ -358,6 +360,8 @@ export default function App() {
     setHandoffData(null);
     setShowHistory(false);
     setPastSessions([]);
+    setSchemeRecommendations([]);
+    setProfileComplete(false);
   };
 
   // ── Load profile from DB for a session ───────────────────────
@@ -397,6 +401,8 @@ export default function App() {
       setLatestEligibility(null);
       setCrossMatches([]);
       setHandoffData(null);
+      setSchemeRecommendations([]);
+      setProfileComplete(false);
       // Load any existing profile slots for this new session (usually empty)
       await loadProfileFromDB(data.session_id);
     } catch (err) {
@@ -532,7 +538,7 @@ export default function App() {
     }
   };
 
-    const startRecording = async () => {
+  const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -595,6 +601,8 @@ export default function App() {
       if (data.eligibility_result) setLatestEligibility(data.eligibility_result);
       if (data.cross_scheme_matches) setCrossMatches(data.cross_scheme_matches);
       if (data.handoff_triggered) fetchHandoff(sessionId);
+      if (data.scheme_recommendations) setSchemeRecommendations(data.scheme_recommendations);
+      if (data.profile_complete !== undefined) setProfileComplete(data.profile_complete);
 
       // Always re-fetch profile from DB after each turn to catch any DB-persisted slots
       await loadProfileFromDB(sessionId);
@@ -602,7 +610,7 @@ export default function App() {
       if (data.audio_b64) {
         setStatus('speaking');
         const audio = new Audio(`data:audio/mp3;base64,${data.audio_b64}`);
-        audio.play().catch(() => {});
+        audio.play().catch(() => { });
         audio.onended = () => setStatus('idle');
       } else {
         setStatus('idle');
@@ -763,6 +771,14 @@ export default function App() {
 
       setChatQState({ state: data.next_state, currentQuestion: data.current_question });
 
+      // Turn off text mode automatically when questionnaire is complete
+      if (data.next_state === 'COMPLETE') {
+        setTimeout(() => {
+          setChatModeActive(false);
+          chatModeActiveRef.current = false;
+        }, 1500); // 1.5s delay so user sees the transition
+      }
+
       // Update the optimistic turn with agent reply + optional table
       setTurns(prev => prev.map(t =>
         t.id === tempId
@@ -778,7 +794,7 @@ export default function App() {
       if (data.audio_b64) {
         setStatus('speaking');
         const audio = new Audio(`data:audio/mp3;base64,${data.audio_b64}`);
-        audio.play().catch(() => {});
+        audio.play().catch(() => { });
         audio.onended = () => setStatus('idle');
       }
 
@@ -805,10 +821,10 @@ export default function App() {
 
   // ── Status label helper ──────────────────────────────────────
   const statusLabel = {
-    idle:       language === 'hi' ? 'बोलने के लिए माइक दबाएं'        : 'Hold Mic to Speak',
-    listening:  language === 'hi' ? 'सुन रहे हैं…'                  : 'Listening…',
+    idle: language === 'hi' ? 'बोलने के लिए माइक दबाएं' : 'Hold Mic to Speak',
+    listening: language === 'hi' ? 'सुन रहे हैं…' : 'Listening…',
     processing: language === 'hi' ? 'सोच रहे हैं (Gemini & Engine)…' : 'Thinking (Gemini & Rules)…',
-    speaking:   language === 'hi' ? 'बोल रहे हैं (Rime Coda)…'      : 'Speaking (Rime Coda)…',
+    speaking: language === 'hi' ? 'बोल रहे हैं (Rime Coda)…' : 'Speaking (Rime Coda)…',
   }[status];
 
   // ── Auth guard ─────────────────────────────────────────────
@@ -886,7 +902,7 @@ export default function App() {
             >
               <Menu size={20} />
             </button>
-            
+
             {showUserMenu && authUser && (
               <div className="user-dropdown">
                 <div className="user-dropdown-header">
@@ -927,21 +943,21 @@ export default function App() {
           <div className="unified-header">
             <h2>{language === 'hi' ? 'वॉयस असिस्टेंट' : 'Voice Assistant'}</h2>
             <p style={{ minHeight: '42px' }}>
-              <TypewriterText 
+              <TypewriterText
                 texts={
                   language === 'hi'
                     ? [
-                        'माइक पर टैप करें और उन योजनाओं को खोजने के लिए बोलना शुरू करें जिनके आप पात्र हैं।',
-                        'माइक बटन को दबाए रखें, अपना प्रश्न बोलें, और छोड़ दें।',
-                        'हिंदी या अंग्रेजी में सरकारी योजनाओं के बारे में पूछें।',
-                        'पता करें कि कौन से कल्याणकारी कार्यक्रम आपकी प्रोफ़ाइल से मेल खाते हैं।'
-                      ]
+                      'माइक पर टैप करें और उन योजनाओं को खोजने के लिए बोलना शुरू करें जिनके आप पात्र हैं।',
+                      'माइक बटन को दबाए रखें, अपना प्रश्न बोलें, और छोड़ दें।',
+                      'हिंदी या अंग्रेजी में सरकारी योजनाओं के बारे में पूछें।',
+                      'पता करें कि कौन से कल्याणकारी कार्यक्रम आपकी प्रोफ़ाइल से मेल खाते हैं।'
+                    ]
                     : [
-                        'Tap the microphone and start speaking to find schemes you qualify for.',
-                        'Hold the microphone button, speak your query, and release.',
-                        'Ask about government schemes in Hindi or English.',
-                        'Find out which welfare programs match your profile.'
-                      ]
+                      'Tap the microphone and start speaking to find schemes you qualify for.',
+                      'Hold the microphone button, speak your query, and release.',
+                      'Ask about government schemes in Hindi or English.',
+                      'Find out which welfare programs match your profile.'
+                    ]
                 }
                 speed={40}
                 pause={3000}
@@ -1004,15 +1020,15 @@ export default function App() {
                       texts={
                         language === 'hi'
                           ? [
-                              '"मुझे खेती-बाड़ी और किसान सम्मान निधि योजना के बारे में बताएं"',
-                              '"मेरी उम्र 45 साल है और मैं हरियाणा में रहता हूं"',
-                              '"मुझे वृद्धा पेंशन योजना के बारे में जानना है"'
-                            ]
+                            '"मुझे खेती-बाड़ी और किसान सम्मान निधि योजना के बारे में बताएं"',
+                            '"मेरी उम्र 45 साल है और मैं हरियाणा में रहता हूं"',
+                            '"मुझे वृद्धा पेंशन योजना के बारे में जानना है"'
+                          ]
                           : [
-                              '"Tell me about Kisan Samman Nidhi scheme"',
-                              '"I am 45 years old and live in Haryana"',
-                              '"What schemes am I eligible for?"'
-                            ]
+                            '"Tell me about Kisan Samman Nidhi scheme"',
+                            '"I am 45 years old and live in Haryana"',
+                            '"What schemes am I eligible for?"'
+                          ]
                       }
                       speed={40}
                       pause={3000}
@@ -1103,9 +1119,8 @@ export default function App() {
                         <div className="chat-bubble user">{t.userText}</div>
                       )}
                       {t.agentText && (
-                        <div className={`chat-bubble agent ${language === 'hi' ? 'hindi-text' : ''} ${
-                          t.tableMarkdown ? 'complete-pulse' : ''
-                        }`}>
+                        <div className={`chat-bubble agent ${language === 'hi' ? 'hindi-text' : ''} ${t.tableMarkdown ? 'complete-pulse' : ''
+                          }`}>
                           {tableData ? (
                             <>
                               {tableData.textContent && (
@@ -1253,6 +1268,69 @@ export default function App() {
                   </span>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* ── Eligible Schemes Recommendations Panel ── */}
+          {schemeRecommendations && schemeRecommendations.length > 0 ? (
+            <div className="glass-panel scheme-rec-panel">
+              <h3 className="panel-title">
+                <Sparkles size={14} className="text-saffron" />
+                <span className="text-saffron">
+                  {language === 'hi' ? 'पात्र योजनाएं' : 'Eligible Schemes'}
+                </span>
+              </h3>
+              <p className="scheme-rec-subtitle">
+                {language === 'hi'
+                  ? 'आपकी प्रोफ़ाइल के आधार पर संभावित योजनाएं'
+                  : 'Recommended based on your profile'}
+              </p>
+              <div className="scheme-rec-list">
+                {schemeRecommendations.map((rec, i) => (
+                  <div key={i} className={`scheme-rec-item ${rec.likely_eligible ? 'eligible' : 'partial'}`}>
+                    <div className="scheme-rec-top">
+                      <div className="scheme-rec-name">
+                        {language === 'hi' ? rec.scheme_name_hi : rec.scheme_name_en}
+                      </div>
+                      <span className={`scheme-rec-badge ${rec.likely_eligible ? 'eligible' : 'partial'}`}>
+                        {rec.likely_eligible
+                          ? (language === 'hi' ? '✓ पात्र' : '✓ Eligible')
+                          : (language === 'hi' ? '~ आंशिक' : '~ Partial')}
+                      </span>
+                    </div>
+                    <div className="scheme-rec-reason">{rec.reason}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : profileComplete ? (
+            <div className="glass-panel scheme-rec-panel scheme-rec-loading">
+              <h3 className="panel-title">
+                <Sparkles size={14} className="text-saffron" />
+                <span className="text-saffron">
+                  {language === 'hi' ? 'पात्र योजनाएं' : 'Eligible Schemes'}
+                </span>
+              </h3>
+              <div className="scheme-rec-spinner">
+                <div className="scheme-rec-dot" />
+                <div className="scheme-rec-dot" />
+                <div className="scheme-rec-dot" />
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                {language === 'hi' ? 'योजनाएं ढूंढ रहे हैं…' : 'Finding schemes for you…'}
+              </p>
+            </div>
+          ) : (
+            <div className="glass-panel scheme-rec-panel scheme-rec-empty">
+              <div className="scheme-rec-empty-icon">🏛️</div>
+              <h3 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-dark)', margin: '8px 0 4px' }}>
+                {language === 'hi' ? 'पात्र योजनाएं' : 'Eligible Schemes'}
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                {language === 'hi'
+                  ? 'अपनी जानकारी (उम्र, आय, जाति, राज्य) बोलें — AI आपके लिए सही योजनाएं खोजेगा।'
+                  : 'Share your details (age, income, caste, state) — AI will find matching schemes.'}
+              </p>
             </div>
           )}
 
@@ -1525,42 +1603,42 @@ export default function App() {
               <div className="transcript-modal-footer-actions">
                 {/* End / Continue for active non-current sessions */}
                 {!viewingSession.loading && viewingSession.session &&
-                 viewingSession.session.session_id !== sessionId &&
-                 viewingSession.session.status !== 'completed' && (
-                  <>
-                    <button
-                      className="modal-action-btn modal-end-btn"
-                      onClick={() => setShowEndConfirm(true)}
-                      disabled={sessionActionLoading}
-                      title={language === 'hi' ? 'इस सत्र को समाप्त करें' : 'Mark this session as completed'}
-                    >
-                      <StopCircle size={14} />
-                      {sessionActionLoading
-                        ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
-                        : (language === 'hi' ? 'समाप्त करें' : 'End Session')}
-                    </button>
-                    <button
-                      className="modal-action-btn modal-continue-btn"
-                      onClick={handleContinueSession}
-                      disabled={sessionActionLoading}
-                      title={language === 'hi' ? 'इस सत्र को जारी रखें' : 'Continue this chat session'}
-                    >
-                      <ChevronRight size={14} />
-                      {sessionActionLoading
-                        ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
-                        : (language === 'hi' ? 'जारी रखें' : 'Continue')}
-                    </button>
-                  </>
-                )}
+                  viewingSession.session.session_id !== sessionId &&
+                  viewingSession.session.status !== 'completed' && (
+                    <>
+                      <button
+                        className="modal-action-btn modal-end-btn"
+                        onClick={() => setShowEndConfirm(true)}
+                        disabled={sessionActionLoading}
+                        title={language === 'hi' ? 'इस सत्र को समाप्त करें' : 'Mark this session as completed'}
+                      >
+                        <StopCircle size={14} />
+                        {sessionActionLoading
+                          ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
+                          : (language === 'hi' ? 'समाप्त करें' : 'End Session')}
+                      </button>
+                      <button
+                        className="modal-action-btn modal-continue-btn"
+                        onClick={handleContinueSession}
+                        disabled={sessionActionLoading}
+                        title={language === 'hi' ? 'इस सत्र को जारी रखें' : 'Continue this chat session'}
+                      >
+                        <ChevronRight size={14} />
+                        {sessionActionLoading
+                          ? (language === 'hi' ? 'हो रहा है…' : 'Working…')
+                          : (language === 'hi' ? 'जारी रखें' : 'Continue')}
+                      </button>
+                    </>
+                  )}
 
                 {/* Completed badge (read-only) */}
                 {!viewingSession.loading && viewingSession.session &&
-                 viewingSession.session.status === 'completed' && (
-                  <span className="modal-completed-badge">
-                    <CheckCircle2 size={13} />
-                    {language === 'hi' ? 'पूर्ण' : 'Completed'}
-                  </span>
-                )}
+                  viewingSession.session.status === 'completed' && (
+                    <span className="modal-completed-badge">
+                      <CheckCircle2 size={13} />
+                      {language === 'hi' ? 'पूर्ण' : 'Completed'}
+                    </span>
+                  )}
               </div>
             </div>
           </div>
