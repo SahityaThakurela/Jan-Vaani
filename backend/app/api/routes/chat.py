@@ -214,11 +214,23 @@ async def chat_turn(
         agent_text = _format_question(QUESTIONS[0], q_state["collected"], language)
         _persist_turn(db, session_id, turn_id, user_message, agent_text)
         await db.commit()
+
+        # ── TTS for greeting (when requested) ────────────────────────────────
+        audio_b64: Optional[str] = None
+        if payload.with_audio:
+            try:
+                audio_bytes = await tts_service.synthesize_speech(agent_text, language)
+                audio_b64 = audio_bytes_to_base64(audio_bytes) if audio_bytes else None
+                logger.info(f"[{session_id}] Greeting TTS synthesized: {len(agent_text)} chars")
+            except Exception as tts_err:
+                logger.warning(f"[{session_id}] Greeting TTS failed (non-critical): {tts_err}")
+
         return ChatTurnResponse(
             session_id=session_id,
             agent_text=agent_text,
             next_state=STATE_COLLECTING,
             current_question=1,
+            audio_b64=audio_b64,
         )
 
     # ── COLLECTING state: extract answer, advance question ────────────────────

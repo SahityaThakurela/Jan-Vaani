@@ -318,6 +318,8 @@ export default function App() {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const transcriptEndRef = useRef(null);
+  const silenceTimerRef = useRef(null);
+  const audioContextRef = useRef(null);
 
 
   useEffect(() => {
@@ -563,6 +565,50 @@ export default function App() {
       mediaRecorderRef.current.start();
       setRecording(true);
       setStatus('listening');
+
+      // ── Silence Detection (Auto-stop) ──
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContext();
+      audioContextRef.current = audioCtx;
+      const analyser = audioCtx.createAnalyser();
+      const microphone = audioCtx.createMediaStreamSource(stream);
+      microphone.connect(analyser);
+      analyser.fftSize = 512;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      let hasSpoken = false;
+      let lastSpokenTime = Date.now();
+
+      const checkSilence = () => {
+        if (!mediaRecorderRef.current || mediaRecorderRef.current.state !== 'recording') return;
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          sum += dataArray[i];
+        }
+        const average = sum / bufferLength;
+
+        if (average > 15) { // volume threshold
+          hasSpoken = true;
+          lastSpokenTime = Date.now();
+        } else {
+          const now = Date.now();
+          // If spoken, wait 3s of silence to auto-stop
+          if (hasSpoken && (now - lastSpokenTime > 3000)) {
+            stopRecording();
+            return;
+          }
+          // If nothing spoken at all for 4 seconds, auto-stop
+          else if (!hasSpoken && (now - lastSpokenTime > 4000)) {
+            stopRecording();
+            return;
+          }
+        }
+        silenceTimerRef.current = requestAnimationFrame(checkSilence);
+      };
+      checkSilence();
+
     } catch (err) {
       console.error('Mic error:', err);
       alert('Microphone access is required. Please allow mic access in your browser.');
@@ -570,7 +616,14 @@ export default function App() {
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && recording) {
+    if (silenceTimerRef.current) cancelAnimationFrame(silenceTimerRef.current);
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close().catch(() => { });
+    }
+    audioContextRef.current = null;
+
+    // Use mediaRecorderRef.current.state directly — avoids stale React state in closures
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setRecording(false);
       setStatus('processing');
@@ -678,9 +731,9 @@ export default function App() {
       const transcript = sttData.transcript?.trim();
       if (!transcript) { setStatus('idle'); return; }
 
-      // Step 2: Feed transcript into questionnaire with audio reply requested
+      // Step 2: Feed transcript into questionnaire with audio reply + auto-record next
       setStatus('idle');
-      await sendChatMessage(transcript, true);   // true = with_audio
+      await sendChatMessage(transcript, true, true);   // with_audio=true, autoRecord=true
     } catch (err) {
       console.error('Voice-for-chat error:', err);
       setStatus('idle');
@@ -741,17 +794,22 @@ export default function App() {
   };
 
   // ── Text chat: send a message to /chat/turn ──────────────────
-  // withAudio=true → backend synthesizes TTS and returns audio_b64 (used in voice mode)
-  const sendChatMessage = async (msg, withAudio = false) => {
+  // withAudio=true → backend synthesizes TTS and returns audio_b64
+  // autoRecord=true → after TTS finishes, auto-start mic (voice-in-chat mode)
+  const sendChatMessage = async (msg, withAudio = false, autoRecord = false) => {
     if (!sessionId || !msg.trim()) return;
     const userMsg = msg.trim();
     setChatInput('');
     setChatSending(true);
     setChatTyping(true);
 
-    // Optimistically add user bubble
+    // Optimistically add user bubble (hide [Greeting] from chat history)
     const tempId = `chat-${Date.now()}`;
-    setTurns(prev => [...prev, { id: tempId, userText: userMsg, agentText: null, action: 'CHAT' }]);
+    if (userMsg !== 'Hello' && userMsg !== 'नमस्ते') {
+      setTurns(prev => [...prev, { id: tempId, userText: userMsg, agentText: null, action: 'CHAT' }]);
+    } else {
+      setTurns(prev => [...prev, { id: tempId, userText: null, agentText: null, action: 'CHAT' }]);
+    }
 
     try {
       const res = await fetch(`${API_BASE}/chat/turn`, {
@@ -793,12 +851,18 @@ export default function App() {
       if (data.slots_extracted) setProfile(prev => ({ ...prev, ...data.slots_extracted }));
       await loadProfileFromDB(sessionId);
 
-      // Play TTS audio if provided (voice-triggered chat mode)
+      // Play TTS audio if provided
       if (data.audio_b64) {
         setStatus('speaking');
         const audio = new Audio(`data:audio/mp3;base64,${data.audio_b64}`);
         audio.play().catch(() => { });
-        audio.onended = () => setStatus('idle');
+        audio.onended = () => {
+          setStatus('idle');
+          // Only auto-start mic in voice-driven chat mode (autoRecord flag)
+          if (chatModeActiveRef.current && autoRecord) {
+            startRecording();
+          }
+        };
       }
 
     } catch (err) {
@@ -806,7 +870,7 @@ export default function App() {
     } finally {
       setChatTyping(false);
       setChatSending(false);
-      // Refocus text input (only if in text mode, not voice mode)
+      // Refocus text input (only if in pure text mode, not voice mode)
       if (!withAudio) setTimeout(() => chatInputRef.current?.focus(), 80);
     }
   };
@@ -816,8 +880,8 @@ export default function App() {
     setChatModeActive(next);
     chatModeActiveRef.current = next;   // keep ref in sync for closure use in onstop
     if (next && sessionId && chatQState.state === 'GREETING') {
-      // Kick off the questionnaire automatically with a greeting trigger
-      sendChatMessage(language === 'hi' ? 'नमस्ते' : 'Hello');
+      // Kick off the questionnaire with TTS greeting; do NOT auto-start mic (text mode)
+      sendChatMessage(language === 'hi' ? 'नमस्ते' : 'Hello', true, false);
     }
     if (next) setTimeout(() => chatInputRef.current?.focus(), 150);
   };
@@ -827,7 +891,7 @@ export default function App() {
     // Let's close All Schemes to keep UI clean.
     setShowAllSchemes(false);
     setHowToApplyState({ loading: true, data: null, error: null, audio: null });
-    
+
     try {
       const res = await fetch(`${API_BASE}/schemes/how-to-apply`, {
         method: 'POST',
@@ -841,11 +905,11 @@ export default function App() {
       if (!res.ok) throw new Error('Network error');
       const data = await res.json();
       setHowToApplyState({ loading: false, data, error: null, audio: null });
-      
+
       if (data.audio_b64) {
         setStatus('speaking');
         const audio = new Audio(`data:audio/mp3;base64,${data.audio_b64}`);
-        audio.play().catch(() => {});
+        audio.play().catch(() => { });
         audio.onended = () => setStatus('idle');
         setHowToApplyState(prev => ({ ...prev, audio }));
       }
@@ -1334,8 +1398,8 @@ export default function App() {
                       </span>
                     </div>
                     <div className="scheme-rec-reason">{rec.reason}</div>
-                    <button 
-                      className="how-to-apply-btn" 
+                    <button
+                      className="how-to-apply-btn"
                       onClick={() => handleHowToApply(rec)}
                       style={{ marginTop: '8px', padding: '4px 8px', fontSize: '0.75rem', borderRadius: '4px', border: '1px solid var(--saffron)', background: 'var(--saffron-pale)', color: 'var(--saffron-dim)', cursor: 'pointer', fontWeight: 600 }}
                     >
@@ -1759,8 +1823,8 @@ export default function App() {
                     </span>
                   </div>
                   <div className="scheme-rec-reason" style={{ fontSize: '0.85rem' }}>{rec.reason}</div>
-                  <button 
-                    className="how-to-apply-btn" 
+                  <button
+                    className="how-to-apply-btn"
                     onClick={() => handleHowToApply(rec)}
                     style={{ marginTop: '8px', alignSelf: 'flex-start', padding: '4px 10px', fontSize: '0.8rem', borderRadius: '4px', border: '1px solid var(--saffron)', background: 'var(--saffron-pale)', color: 'var(--saffron-dim)', cursor: 'pointer', fontWeight: 600 }}
                   >
@@ -1798,7 +1862,7 @@ export default function App() {
                 <X size={16} />
               </button>
             </div>
-            
+
             <div className="schemes-modal-body">
               {howToApplyState.loading && (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
@@ -1806,7 +1870,7 @@ export default function App() {
                   <p>{language === 'hi' ? 'आवेदन प्रक्रिया तैयार की जा रही है...' : 'Generating application steps...'}</p>
                 </div>
               )}
-              
+
               {howToApplyState.error && (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--crimson)' }}>
                   <AlertTriangle size={32} style={{ margin: '0 auto 12px' }} />
@@ -1816,12 +1880,12 @@ export default function App() {
 
               {howToApplyState.data && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  
+
                   {/* Speaker indicator */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'var(--cream-dark)', borderRadius: 'var(--r-sm)', color: 'var(--saffron)' }}>
                     <Activity size={16} className={status === 'speaking' ? 'status-indicator-icon' : ''} />
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
-                      {status === 'speaking' 
+                      {status === 'speaking'
                         ? (language === 'hi' ? 'AI बोल रहा है...' : 'AI is speaking...')
                         : (language === 'hi' ? 'मार्गदर्शिका' : 'Application Guide')}
                     </span>
