@@ -2208,3 +2208,207 @@ body {
   50% { transform: rotate(2deg) skewX(2deg); }
   100% { transform: rotate(0deg) skewX(0deg); }
 }
+
+
+/* ================================================================
+   TEXT CHAT — Input Bar, Markdown Tables, Questionnaire Progress
+================================================================ */
+
+/* ── Chat mode toggle button in transcript header ─────────────── */
+.chat-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1.5px solid var(--saffron);
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--saffron);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+.chat-mode-toggle:hover {
+  background: var(--saffron-pale);
+  transform: translateY(-1px);
+}
+.chat-mode-toggle.active {
+  background: var(--saffron);
+  color: #fff;
+}
+
+/* ── Question progress badge ──────────────────────────────────── */
+.chat-progress-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: var(--green-pale);
+  border: 1px solid rgba(45,106,79,0.2);
+  border-radius: var(--r-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--green-mid);
+  margin-bottom: 8px;
+}
+.chat-progress-bar-track {
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.chat-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--saffron), var(--green-mid));
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Text input bar at bottom of transcript panel ─────────────── */
+.chat-input-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-top: 1.5px solid var(--border);
+  background: rgba(255,253,248,0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  animation: slideUpFade 0.25s ease;
+}
+
+.chat-input-field {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--r-full);
+  background: var(--cream);
+  color: var(--text-dark);
+  font-family: var(--font-main);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.chat-input-field:focus {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 3px rgba(212, 114, 12, 0.12);
+}
+.chat-input-field::placeholder {
+  color: var(--text-light);
+}
+
+.chat-send-btn {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--saffron);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.chat-send-btn:hover:not(:disabled) {
+  background: var(--saffron-dim);
+  transform: scale(1.08);
+}
+.chat-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Markdown table rendered inside agent bubble ──────────────── */
+.markdown-table-wrapper {
+  margin-top: 10px;
+  overflow-x: auto;
+  border-radius: var(--r-sm);
+}
+
+.markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  font-family: var(--font-main);
+  background: rgba(255,255,255,0.7);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.markdown-table thead th {
+  background: var(--saffron);
+  color: #fff;
+  padding: 8px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.80rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.markdown-table tbody tr {
+  border-bottom: 1px solid rgba(160,102,58,0.12);
+  transition: background 0.15s;
+}
+.markdown-table tbody tr:last-child {
+  border-bottom: none;
+}
+.markdown-table tbody tr:hover {
+  background: rgba(212,114,12,0.06);
+}
+
+.markdown-table tbody td {
+  padding: 7px 14px;
+  color: var(--text-dark);
+  vertical-align: middle;
+}
+.markdown-table tbody td:first-child {
+  font-weight: 600;
+  color: var(--brown-mid);
+  white-space: nowrap;
+}
+.markdown-table tbody td:last-child {
+  color: var(--green-dark);
+}
+
+/* Table inside agent bubble — override bubble background slightly */
+.chat-bubble.agent .markdown-table-wrapper {
+  margin-top: 8px;
+}
+
+/* Complete state celebration pulse on the bubble */
+.chat-bubble.agent.complete-pulse {
+  animation: completePulse 0.6s ease forwards;
+}
+@keyframes completePulse {
+  0%   { box-shadow: 0 0 0 0 rgba(45,106,79,0.4); }
+  60%  { box-shadow: 0 0 0 10px rgba(45,106,79,0); }
+  100% { box-shadow: none; }
+}
+
+/* ── Typing indicator for chat (3-dot bounce) ─────────────────── */
+.chat-typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 10px 16px;
+}
+.chat-typing-indicator span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--saffron-light);
+  animation: typingBounce 1.2s infinite;
+}
+.chat-typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40%           { transform: translateY(-8px); opacity: 1; }
+}

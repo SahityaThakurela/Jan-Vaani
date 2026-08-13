@@ -57,7 +57,35 @@ UNIVERSAL_PROFILE_SLOTS = [
 ]
 
 
+@router.post("/transcribe")
+async def transcribe_only(
+    session_id: str = Form(...),
+    language: str = Form(default="hi"),
+    audio: UploadFile = File(...),
+):
+    """
+    STT-only endpoint — converts audio to text without running any LLM or TTS pipeline.
+    Used when the frontend is in chat/questionnaire mode and needs just the spoken transcript.
+
+    Returns: { transcript, confidence, language }
+    """
+    audio_bytes = await audio.read()
+    mimetype = audio.content_type or "audio/webm"
+    try:
+        stt_result = await stt_service.transcribe_audio(audio_bytes, language, mimetype)
+        logger.info(f"[{session_id}] /transcribe: '{stt_result['transcript'][:80]}'")
+        return {
+            "transcript": stt_result["transcript"],
+            "confidence": stt_result.get("confidence", 1.0),
+            "language": language,
+        }
+    except Exception as e:
+        logger.error(f"[{session_id}] Transcribe failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Speech recognition failed: {str(e)}")
+
+
 @router.post("/turn", response_model=VoiceTurnResponse)
+
 async def voice_turn(
     session_id: str = Form(...),
     language: str = Form(default="hi"),

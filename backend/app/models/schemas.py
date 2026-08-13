@@ -202,3 +202,23 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ─────────────────────────────────────────────────────────────
+# Text Chat (Questionnaire)
+# ─────────────────────────────────────────────────────────────
+class ChatTurnRequest(BaseModel):
+    session_id: str
+    message: str = Field(..., min_length=1, max_length=2000)
+    language: str = Field(default="hi", pattern="^(hi|en)$")
+    with_audio: bool = Field(default=False, description="If True, synthesize TTS and return audio_b64")
+
+
+class ChatTurnResponse(BaseModel):
+    session_id: str
+    agent_text: str
+    next_state: str                         # GREETING | COLLECTING | COMPLETE
+    current_question: Optional[int] = None  # 1-based index of current Q, None when done
+    slots_extracted: Optional[Dict[str, Any]] = None
+    table_markdown: Optional[str] = None    # Populated only when state == COMPLETE
+    audio_b64: Optional[str] = None         # Base64 MP3 audio, populated when with_audio=True

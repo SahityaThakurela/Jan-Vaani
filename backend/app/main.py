@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.utils.logger import get_logger
 from app.db.init_db import initialize_database
-from app.api.routes import session, voice, schemes, eligibility, handoff, auth
+from app.api.routes import session, voice, schemes, eligibility, handoff, auth, chat
 
 logger = get_logger(__name__)
 
@@ -53,6 +53,7 @@ app.include_router(voice.router, prefix="/voice", tags=["Voice Pipeline"])
 app.include_router(schemes.router, prefix="/schemes", tags=["Schemes"])
 app.include_router(eligibility.router, prefix="/eligibility", tags=["Eligibility"])
 app.include_router(handoff.router, prefix="/handoff", tags=["Handoff"])
+app.include_router(chat.router, prefix="/chat", tags=["Text Chat"])
 
 
 

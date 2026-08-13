@@ -3,7 +3,7 @@ import {
   Mic, Square, PhoneOff, Sparkles,
   CheckCircle2, AlertTriangle, Headphones, LogOut, User,
   Zap, Activity, Radio, ChevronRight, StopCircle, History, X,
-  MessageSquare, Clock, Menu, Calendar
+  MessageSquare, Clock, Menu, Calendar, Send, MessageCircle
 } from 'lucide-react';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -299,9 +299,21 @@ export default function App() {
   const [sessionActionLoading, setSessionActionLoading] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
 
+  // ── Text chat / questionnaire state ──────────────────────────
+  const [chatModeActive, setChatModeActive] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [chatSending, setChatSending] = useState(false);
+  const [chatTyping, setChatTyping] = useState(false);
+  // { state: 'GREETING'|'COLLECTING'|'COMPLETE', currentQuestion: number|null }
+  const [chatQState, setChatQState] = useState({ state: 'GREETING', currentQuestion: null });
+  const chatInputRef = useRef(null);
+  // Ref that mirrors chatModeActive for use inside closures (e.g. MediaRecorder.onstop)
+  const chatModeActiveRef = useRef(false);
+
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const transcriptEndRef = useRef(null);
+
 
   useEffect(() => {
     if (authUser) {
@@ -532,7 +544,12 @@ export default function App() {
       };
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await sendAudioTurn(audioBlob);
+        // If the questionnaire chat mode is active, route through STT-only → chat turn
+        if (chatModeActiveRef.current) {
+          await sendVoiceForChat(audioBlob);
+        } else {
+          await sendAudioTurn(audioBlob);
+        }
       };
       mediaRecorderRef.current.start();
       setRecording(true);
@@ -626,6 +643,164 @@ export default function App() {
     } catch (err) {
       console.error('Fetch handoff failed:', err);
     }
+  };
+
+  // ── Voice-for-chat: STT only → questionnaire pipeline ────────
+  // Called when chatModeActive=true and user uses the mic.
+  // Sends audio to /voice/transcribe for STT, then feeds text to sendChatMessage.
+  const sendVoiceForChat = async (audioBlob) => {
+    if (!sessionId) return;
+    const formData = new FormData();
+    formData.append('session_id', sessionId);
+    formData.append('language', language);
+    formData.append('audio', audioBlob, 'turn.webm');
+    try {
+      // Step 1: STT only — get transcript without running the full voice pipeline
+      const sttRes = await fetch(`${API_BASE}/voice/transcribe`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: formData,
+      });
+      if (sttRes.status === 401) { handleLogout(); return; }
+      if (!sttRes.ok) { setStatus('idle'); return; }
+      const sttData = await sttRes.json();
+      const transcript = sttData.transcript?.trim();
+      if (!transcript) { setStatus('idle'); return; }
+
+      // Step 2: Feed transcript into questionnaire with audio reply requested
+      setStatus('idle');
+      await sendChatMessage(transcript, true);   // true = with_audio
+    } catch (err) {
+      console.error('Voice-for-chat error:', err);
+      setStatus('idle');
+    }
+  };
+
+  // ── Text chat: parse markdown table → <table> ────────────────
+  const renderMarkdownTable = (markdown) => {
+    if (!markdown) return null;
+    // Split into lines, find table block(s)
+    const lines = markdown.split('\n');
+    // Identify text lines vs table lines
+    const textLines = [];
+    const tableLines = [];
+    let inTable = false;
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('|')) {
+        inTable = true;
+        tableLines.push(trimmed);
+      } else {
+        if (inTable) inTable = false;
+        textLines.push(line);
+      }
+    });
+
+    // Build <table> from tableLines
+    let tableEl = null;
+    if (tableLines.length >= 2) {
+      const parseRow = (row) =>
+        row.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+
+      const headerCells = parseRow(tableLines[0]);
+      // tableLines[1] is the separator (--- row), skip it
+      const bodyRows = tableLines.slice(2).map(parseRow);
+
+      tableEl = (
+        <div className="markdown-table-wrapper">
+          <table className="markdown-table">
+            <thead>
+              <tr>{headerCells.map((h, i) => <th key={i}>{h}</th>)}</tr>
+            </thead>
+            <tbody>
+              {bodyRows.map((cells, ri) => (
+                <tr key={ri}>
+                  {cells.map((cell, ci) => <td key={ci}>{cell}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    // Render non-table text
+    const textContent = textLines.join('\n').trim();
+    return { textContent, tableEl };
+  };
+
+  // ── Text chat: send a message to /chat/turn ──────────────────
+  // withAudio=true → backend synthesizes TTS and returns audio_b64 (used in voice mode)
+  const sendChatMessage = async (msg, withAudio = false) => {
+    if (!sessionId || !msg.trim()) return;
+    const userMsg = msg.trim();
+    setChatInput('');
+    setChatSending(true);
+    setChatTyping(true);
+
+    // Optimistically add user bubble
+    const tempId = `chat-${Date.now()}`;
+    setTurns(prev => [...prev, { id: tempId, userText: userMsg, agentText: null, action: 'CHAT' }]);
+
+    try {
+      const res = await fetch(`${API_BASE}/chat/turn`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: userMsg,
+          language,
+          with_audio: withAudio,
+        }),
+      });
+      if (res.status === 401) { handleLogout(); return; }
+      if (!res.ok) {
+        setChatTyping(false);
+        setChatSending(false);
+        return;
+      }
+      const data = await res.json();
+
+      setChatQState({ state: data.next_state, currentQuestion: data.current_question });
+
+      // Update the optimistic turn with agent reply + optional table
+      setTurns(prev => prev.map(t =>
+        t.id === tempId
+          ? { ...t, agentText: data.agent_text, tableMarkdown: data.table_markdown || null, action: 'CHAT' }
+          : t
+      ));
+
+      // Merge extracted slots into profile panel
+      if (data.slots_extracted) setProfile(prev => ({ ...prev, ...data.slots_extracted }));
+      await loadProfileFromDB(sessionId);
+
+      // Play TTS audio if provided (voice-triggered chat mode)
+      if (data.audio_b64) {
+        setStatus('speaking');
+        const audio = new Audio(`data:audio/mp3;base64,${data.audio_b64}`);
+        audio.play().catch(() => {});
+        audio.onended = () => setStatus('idle');
+      }
+
+    } catch (err) {
+      console.error('Chat turn error:', err);
+    } finally {
+      setChatTyping(false);
+      setChatSending(false);
+      // Refocus text input (only if in text mode, not voice mode)
+      if (!withAudio) setTimeout(() => chatInputRef.current?.focus(), 80);
+    }
+  };
+
+  const toggleChatMode = () => {
+    const next = !chatModeActive;
+    setChatModeActive(next);
+    chatModeActiveRef.current = next;   // keep ref in sync for closure use in onstop
+    if (next && sessionId && chatQState.state === 'GREETING') {
+      // Kick off the questionnaire automatically with a greeting trigger
+      sendChatMessage(language === 'hi' ? 'नमस्ते' : 'Hello');
+    }
+    if (next) setTimeout(() => chatInputRef.current?.focus(), 150);
   };
 
   // ── Status label helper ──────────────────────────────────────
@@ -829,7 +1004,7 @@ export default function App() {
                       texts={
                         language === 'hi'
                           ? [
-                              '"मुझे खेती-बाड़ी और किसान सम्मान निधि योजना के बारे में बताएं"',
+                              '"मुझे खेती-बाड़ी और किसान सम्मान निधि योजना के बारे में बताएं"',
                               '"मेरी उम्र 45 साल है और मैं हरियाणा में रहता हूं"',
                               '"मुझे वृद्धा पेंशन योजना के बारे में जानना है"'
                             ]
@@ -863,15 +1038,46 @@ export default function App() {
             <div className="transcript-panel-header">
               <div className="transcript-panel-title">
                 <div className="dot" />
-                {language === 'hi' ? 'बातचीत' : 'Conversations'}
+                {language === 'hi' ? '\u092c\u093e\u0924\u091a\u0940\u0924' : 'Conversations'}
               </div>
-              <button
-                className="transcript-history-link"
-                onClick={showHistory ? closeHistory : openHistory}
-              >
-                HISTORY
-              </button>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  id="chat-mode-toggle-btn"
+                  className={`chat-mode-toggle ${chatModeActive ? 'active' : ''}`}
+                  onClick={toggleChatMode}
+                  title={chatModeActive
+                    ? (language === 'hi' ? '\u091f\u0947\u0915\u094d\u0938\u094d\u091f \u091a\u0948\u091f \u092c\u0902\u0926 \u0915\u0930\u0947\u0902' : 'Close text chat')
+                    : (language === 'hi' ? '\u091f\u0947\u0915\u094d\u0938\u094d\u091f \u092e\u0947\u0902 \u092a\u0942\u091b\u0947\u0902' : 'Ask via text')}
+                >
+                  <MessageCircle size={11} />
+                  {language === 'hi' ? '\u091f\u0947\u0915\u094d\u0938\u094d\u091f' : 'TEXT'}
+                </button>
+                <button
+                  className="transcript-history-link"
+                  onClick={showHistory ? closeHistory : openHistory}
+                >
+                  HISTORY
+                </button>
+              </div>
             </div>
+
+            {/* Questionnaire progress bar */}
+            {chatModeActive && chatQState.state === 'COLLECTING' && chatQState.currentQuestion != null && (
+              <div style={{ padding: '6px 14px 0' }}>
+                <div className="chat-progress-badge">
+                  <span>📝</span>
+                  {language === 'hi'
+                    ? `\u092a\u094d\u0930\u0936\u094d\u0928 ${chatQState.currentQuestion} / 7`
+                    : `Question ${chatQState.currentQuestion} of 7`}
+                </div>
+                <div className="chat-progress-bar-track">
+                  <div
+                    className="chat-progress-bar-fill"
+                    style={{ width: `${(chatQState.currentQuestion / 7) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="transcript-box">
               {turns.length === 0 ? (
@@ -880,30 +1086,84 @@ export default function App() {
                     <MessageSquare size={22} />
                   </div>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--text-dark)' }}>
-                    {language === 'hi' ? 'अभी तक कोई बातचीत नहीं हुई' : 'No conversations yet'}
+                    {language === 'hi' ? '\u0905\u092d\u0940 \u0924\u0915 \u0915\u094b\u0908 \u092c\u093e\u0924\u091a\u0940\u0924 \u0928\u0939\u0940\u0902 \u0939\u0941\u0908' : 'No conversations yet'}
                   </h3>
                   <p style={{ marginTop: '6px', color: 'var(--text-muted)', fontSize: '0.83rem', lineHeight: 1.6 }}>
                     {language === 'hi'
-                      ? 'चिंता न करें। उनार दिए गए बड़े लाल बटन को दबाकर पूछें: "मुझे बुढ़्फ़ा पेंशन योजना के बारे में जानना है"'
-                      : 'Hold the red button above and ask: "Tell me about old age pension scheme"'}
+                      ? '\u092e\u093e\u0907\u0915 \u0926\u092c\u093e\u0915\u0930 \u092a\u0942\u091b\u0947\u0902 \u092f\u093e \u090a\u092a\u0930 "\u091f\u0947\u0915\u094d\u0938\u094d\u091f" \u092c\u091f\u0928 \u0938\u0947 \u0905\u092a\u0928\u0940 \u091c\u093e\u0928\u0915\u093e\u0930\u0940 \u092d\u0930\u0947\u0902\u0964'
+                      : 'Hold the mic to ask, or click "TEXT" above to fill your profile.'}
                   </p>
                 </div>
               ) : (
-                turns.map((t) => (
-                  <div key={t.id} className="turn-card">
-                    {t.userText && (
-                      <div className="chat-bubble user">{t.userText}</div>
-                    )}
-                    {t.agentText && (
-                      <div className={`chat-bubble agent ${language === 'hi' ? 'hindi-text' : ''}`}>
-                        {t.agentText}
-                      </div>
-                    )}
-                  </div>
-                ))
+                turns.map((t) => {
+                  const tableData = t.tableMarkdown ? renderMarkdownTable(t.tableMarkdown) : null;
+                  return (
+                    <div key={t.id} className="turn-card">
+                      {t.userText && t.userText !== '[Greeting]' && (
+                        <div className="chat-bubble user">{t.userText}</div>
+                      )}
+                      {t.agentText && (
+                        <div className={`chat-bubble agent ${language === 'hi' ? 'hindi-text' : ''} ${
+                          t.tableMarkdown ? 'complete-pulse' : ''
+                        }`}>
+                          {tableData ? (
+                            <>
+                              {tableData.textContent && (
+                                <span style={{ display: 'block', marginBottom: tableData.tableEl ? '4px' : 0 }}>
+                                  {tableData.textContent}
+                                </span>
+                              )}
+                              {tableData.tableEl}
+                            </>
+                          ) : (
+                            t.agentText
+                          )}
+                        </div>
+                      )}
+                      {!t.agentText && chatTyping && t.action === 'CHAT' && (
+                        <div className="chat-bubble agent">
+                          <div className="chat-typing-indicator">
+                            <span /><span /><span />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
               )}
               <div ref={transcriptEndRef} />
             </div>
+
+            {/* Chat text input bar */}
+            {chatModeActive && (
+              <div className="chat-input-bar">
+                <input
+                  ref={chatInputRef}
+                  id="chat-text-input"
+                  className="chat-input-field"
+                  type="text"
+                  value={chatInput}
+                  onChange={e => setChatInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !chatSending && chatInput.trim()) {
+                      sendChatMessage(chatInput);
+                    }
+                  }}
+                  placeholder={language === 'hi' ? '\u092f\u0939\u093e\u0901 \u091f\u093e\u0907\u092a \u0915\u0930\u0947\u0902\u2026' : 'Type your answer here\u2026'}
+                  disabled={chatSending || chatQState.state === 'COMPLETE'}
+                  maxLength={500}
+                />
+                <button
+                  id="chat-send-btn"
+                  className="chat-send-btn"
+                  onClick={() => sendChatMessage(chatInput)}
+                  disabled={chatSending || !chatInput.trim() || chatQState.state === 'COMPLETE'}
+                  title={language === 'hi' ? '\u092d\u0947\u091c\u0947\u0902' : 'Send'}
+                >
+                  <Send size={16} />
+                </button>
+              </div>
+            )}
 
             {status !== 'idle' && (
               <div className={`status-indicator ${status}`}>
