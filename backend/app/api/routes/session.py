@@ -44,7 +44,7 @@ async def list_sessions(
         turn_count = turns_count_result.scalar() or 0
         session_list.append({
             "session_id": s.session_id,
-            "title": s.title,
+            "title": s.title ,
             "language": s.language,
             "status": s.status,
             "current_state": s.current_state,
