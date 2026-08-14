@@ -293,6 +293,7 @@ export default function App() {
   const [profileComplete, setProfileComplete] = useState(false);
   const [showAllSchemes, setShowAllSchemes] = useState(false);
   const [howToApplyState, setHowToApplyState] = useState({ loading: false, data: null, error: null, audio: null });
+  const [finalReportModal, setFinalReportModal] = useState({ open: false, text: '', table: null });
 
   // History panel state
   const [showHistory, setShowHistory] = useState(false);
@@ -899,6 +900,18 @@ export default function App() {
         questionnairePhaseRef.current = false;
         setChatModeActive(false);
         chatModeActiveRef.current = false;
+
+        setFinalReportModal({
+          open: true,
+          text: data.agent_text,
+          table: data.table_markdown
+        });
+
+        // Use a placeholder text for the chat bubble instead of the full report
+        data.agent_text = language === 'hi' 
+          ? 'रिपोर्ट तैयार कर ली गई है। देखने के लिए पॉप-अप देखें।' 
+          : 'Report generated. Please see the pop-up window.';
+        data.table_markdown = null;
       }
 
       // Update turn with agent reply + optional summary table
@@ -1906,6 +1919,48 @@ export default function App() {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Final Report Modal ── */}
+      {finalReportModal.open && (
+        <div className="schemes-modal-overlay" onClick={() => setFinalReportModal({ ...finalReportModal, open: false })}>
+          <div className="schemes-modal" onClick={e => e.stopPropagation()}>
+            <div className="schemes-modal-header">
+              <h2 className="schemes-modal-title">
+                <Sparkles size={18} className="text-saffron" />
+                {language === 'hi' ? 'अंतिम रिपोर्ट' : 'Final Report'}
+              </h2>
+              <button 
+                className="modal-close-btn" 
+                onClick={() => setFinalReportModal({ ...finalReportModal, open: false })}
+                style={{ padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="schemes-modal-body">
+              {finalReportModal.text && (
+                <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '0.9rem', color: 'var(--text-dark)' }}>
+                  {finalReportModal.text}
+                </div>
+              )}
+              {finalReportModal.table && (
+                <div style={{ marginTop: '16px' }}>
+                  {renderMarkdownTable(finalReportModal.table).tableEl}
+                </div>
+              )}
+            </div>
+            <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', background: 'var(--paper)' }}>
+              <button
+                onClick={() => setFinalReportModal({ ...finalReportModal, open: false })}
+                className="landing-primary-btn"
+                style={{ padding: '8px 16px', fontSize: '0.9rem', borderRadius: 'var(--r-full)' }}
+              >
+                {language === 'hi' ? 'बातचीत जारी रखें' : 'Continue Talk'}
+              </button>
             </div>
           </div>
         </div>
