@@ -11,7 +11,7 @@ import './index.css';
 import './schemes-modal.css';
 import Landing from './pages/Landing';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://jan-vaani-8z6e.onrender.com';
 
 // ── Auth helpers ──────────────────────────────────────────────
 function getToken() {

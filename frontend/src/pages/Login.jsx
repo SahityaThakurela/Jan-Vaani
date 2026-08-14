@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Mic } from 'lucide-react';
 import RuralBackground from '../components/RuralBackground';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://jan-vaani-8z6e.onrender.com';
 
 const TAGLINES = [
   'सरकारी योजनाएँ, आपकी आवाज़ में।',

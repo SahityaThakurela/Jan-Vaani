@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, Mail, Lock, Eye, EyeOff, User, ArrowRight, AlertCircle, CheckCircle2, Mic } from 'lucide-react';
 import RuralBackground from '../components/RuralBackground';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://jan-vaani-8z6e.onrender.com';
 
 export default function Register({ onAuthSuccess, onGoLogin }) {
   const [fullName, setFullName] = useState('');
