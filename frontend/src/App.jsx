@@ -274,6 +274,7 @@ export default function App() {
   const [authUser, setAuthUser] = useState(getStoredUser);
   const [authView, setAuthView] = useState('login');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // App state
   const [language, setLanguage] = useState('hi');
@@ -1034,7 +1035,14 @@ export default function App() {
           </div>
         </div>
 
-        <div className="navbar-right">
+        <button 
+          className="mobile-menu-btn" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        <div className={`navbar-right ${isMobileMenuOpen ? 'open' : ''}`}>
           <div className="lang-selector">
             <button
               id="lang-hi"

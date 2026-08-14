@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   ArrowRight,
   Mic,
@@ -5,9 +6,12 @@ import {
   ShieldCheck,
   Languages,
   Sparkles,
+  Menu,
+  X
 } from "lucide-react";
 
 export default function Landing({ onGetStarted, onLogin }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <div className="landing-page">
 
@@ -23,7 +27,14 @@ export default function Landing({ onGetStarted, onLogin }) {
           </div>
         </div>
 
-        <div className="landing-nav-actions">
+        <button 
+          className="mobile-menu-btn" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        <div className={`landing-nav-actions ${isMobileMenuOpen ? 'open' : ''}`}>
           <button className="landing-login" onClick={onLogin}>
             Login
           </button>
