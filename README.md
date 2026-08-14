@@ -2,8 +2,7 @@
 
 **Live Demo:** https://jan-vaani-01.vercel.app/
 
-> **StarForge Hackathon 2026 (VoxForge Track)**  
-> *A voice-first platform for rural, low-literacy Indian users to navigate government welfare schemes hands-free, in their own language.*
+*A voice-first platform for rural, low-literacy Indian users to navigate government welfare schemes hands-free, in their own language.*
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
@@ -17,19 +16,35 @@
 
 ---
 
-## 🎯 Overview
+## 🎯 Why We Built This
 
-Jan Vaani is an intelligent, voice-first welfare scheme navigator. It addresses the digital divide by allowing rural citizens to converse naturally in Hindi or English to discover government schemes (Yojanas), check their eligibility, and get personalized guidance—all through a seamless voice interface.
+In much of rural India, the biggest barrier to accessing government welfare schemes isn't awareness — it's the interface. Scheme portals assume literacy, English or formal Hindi comprehension, stable smartphone/data access, and the confidence to fill out forms correctly. For a large population, that gap means entitled benefits (pensions, housing, agricultural subsidies) simply go unclaimed, not because people are ineligible, but because the discovery and application process was never designed for them.
 
-The system uses a unique **Dual-Brain Architecture**:
-- **Generative AI** handles the messy, unstructured nature of human speech (intent classification, entity/slot extraction, and natural language replies).
-- **Deterministic Rules Engine** handles the strict, high-stakes logic (eligibility criteria). The AI never makes eligibility decisions on its own.
+We built Jan Vaani because this is a solvable interface problem, not a policy problem. Everyone can speak; not everyone can read a government form. By making scheme discovery and eligibility-checking a natural spoken conversation in Hindi or English, we remove the literacy and digital-navigation barrier entirely — a user can just talk, the way they would to a helpful person at a local office.
+
+**What this contributes technically:** the core challenge in a system like this isn't conversational fluency — LLMs handle that well. It's trust. A welfare eligibility determination has real consequences, so it cannot be left to a generative model's best guess. Jan Vaani's contribution is a **Dual-Brain Architecture** that cleanly separates these concerns:
+
+- A **generative layer** (LLM) handles the genuinely unstructured part of the problem: understanding free-form speech, extracting intent, and pulling out demographic facts (age, income, state, etc.) from however the user happens to phrase them.
+- A **deterministic rules engine** handles the high-stakes part: evaluating those extracted facts against scheme eligibility criteria using pure, auditable Python logic. The LLM never decides eligibility — it only ever populates the inputs to a rule it cannot influence.
+
+This separation, combined with an auditable "why did/didn't I qualify" trace and a low-confidence human handoff path, is what makes a voice-AI system usable for something as consequential as welfare access, rather than just a novelty demo.
+
+---
+
+## 🎥 Product Demo
+
+> **[Add your demo video link/embed here — e.g. a YouTube link or a GitHub-hosted MP4]**
+>
+> Example once you have it:
+> [![Watch the demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://youtu.be/YOUR_VIDEO_ID)
+
+You can also try the live deployment directly: **https://jan-vaani-01.vercel.app/**
 
 ---
 
 ## 🏗️ Architecture Overview
 
-Jan Vaani uses a state-of-the-art pipeline optimized for **High-Trust Voice Workflows**:
+Jan Vaani uses a pipeline optimized for **high-trust voice workflows**:
 
 ```text
 User (Voice) ──► React Frontend (Push-to-talk / Interruption)
@@ -129,7 +144,9 @@ Jan-Vaani/
 
 ---
 
-## ⚡ Quickstart
+## ⚡ Reproducibility / Quickstart
+
+Follow these steps to set up the project locally and reproduce the results described above.
 
 ### 1. Backend Setup
 
@@ -182,8 +199,6 @@ npm run dev
 
 The application will be available at `http://localhost:5173`.
 
----
-
 ### 3. Docker Setup (Qdrant Vector DB)
 
 The recommended way to run the Qdrant Vector DB locally is via Docker. Ensure you have Docker installed and running, then execute the following command:
@@ -202,16 +217,40 @@ python -m app.data.seed_qdrant
 
 *(Note: If you plan to containerize the entire application stack later, you can create a `docker-compose.yml` file to orchestrate the FastAPI backend, Vite frontend, and Qdrant database together.)*
 
----
+### 4. Running Tests
 
-## 🧪 Testing
-
-The backend includes a comprehensive test suite for the deterministic eligibility engine to ensure accurate evaluations.
+To verify the deterministic eligibility engine is working as expected after setup:
 
 ```bash
 cd backend
 pytest tests/ -v
 ```
+
+---
+
+## 📊 Performance Metrics
+
+> **[Fill in with your actual measured numbers before evaluation — see note below]**
+
+| Metric | Result | Why this metric |
+|---|---|---|
+| Eligibility rule accuracy (test suite pass rate) | *e.g. XX/XX tests passing* | Eligibility is the highest-stakes output of the system; correctness here is measured deterministically via `pytest tests/`, not sampled, since the rules engine is pure logic. |
+| End-to-end voice turn latency (STT → LLM → TTS) | *e.g. ~X.Xs avg* | Directly determines whether the conversation feels natural on a phone call vs. frustratingly slow — critical for a voice-first, hands-free UX. |
+| Intent/slot extraction accuracy | *e.g. XX% on test utterances* | Measures how reliably the LLM layer captures the right facts (age, income, state, etc.) before they reach the deterministic engine — errors here are the main risk to correct eligibility outcomes. |
+| RAG retrieval relevance (Qdrant) | *e.g. top-k hit rate* | Confirms the scheme knowledge surfaced to the user actually matches their query, rather than the LLM hallucinating scheme details. |
+
+*(Replace the placeholder values with numbers from your own test runs/logs — see the note below.)*
+
+---
+
+## 🤝 Credits
+
+This project was made possible by the tools and infrastructure provided by our hackathon partners:
+
+- **[Pathway](https://pathway.com/)**
+- **[Rime](https://rime.ai/)** — powering natural, low-latency Hindi and English text-to-speech (Coda and Mist models).
+- **[Weya](https://weya.ai/)**
+- **[Qdrant](https://qdrant.tech/)** — powering hybrid vector search over our government scheme knowledge base for RAG-based retrieval.
 
 ---
 
